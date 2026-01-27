@@ -1,0 +1,141 @@
+.home {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+
+    .calendar {
+        height: 70%;
+        .ant-card {
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .ant-calendar {
+            border: none;
+
+            // 调整日历整体大小
+            .ant-picker-panel {
+                font-size: 12px; // 减小字体大小
+            }
+
+            // 调整日历单元格大小
+            .ant-picker-cell {
+                height: 60px; // 减小单元格高度
+                .ant-picker-cell-inner {
+                    min-width: auto;
+                    height: 100%;
+                }
+            }
+
+            .ant-picker-calendar-date-content {
+                min-height: 50px; // 减小内容区域最小高度
+                height: 50px;
+                overflow: hidden; // 隐藏超出内容
+            }
+
+            .calendar-cell {
+                max-height: 46px; // 限制单元格最大高度
+                overflow-y: auto; // 允许滚动查看所有内容
+
+                .ant-badge {
+                    font-size: 10px;
+                }
+
+                // 调整随访项样式以适应小尺寸
+                > div {
+                    margin: 1px 0;
+                    padding: 1px 2px;
+                    font-size: 10px;
+
+                    > div:first-child {
+                        margin-bottom: 0;
+                    }
+
+                    .ant-tag {
+                        font-size: 9px;
+                        padding: 0 4px;
+                        line-height: 14px;
+                    }
+                }
+            }
+
+            // 调整日历头部
+            .ant-picker-calendar-header {
+                padding: 8px 0;
+
+                .ant-picker-calendar-year-select,
+                .ant-picker-calendar-month-select {
+                    min-width: 80px;
+                }
+            }
+        }
+    }
+
+    .record-list {
+        .title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 16px;
+            color: #1890ff;
+            border-left: 4px solid #1890ff;
+            padding-left: 12px;
+        }
+    }
+}
+
+// 响应式设计
+@media (max-width: 768px) {
+    .home {
+        padding: 12px !important;
+
+        .calendar {
+            .ant-card {
+                .ant-card-extra {
+                    display: none;
+                }
+            }
+
+            .ant-calendar {
+                .ant-picker-calendar-date-content {
+                    min-height: 40px;
+                    height: 40px;
+                }
+
+                .calendar-cell {
+                    max-height: 36px;
+
+                    > div {
+                        font-size: 9px;
+
+                        .ant-tag {
+                            font-size: 8px;
+                            padding: 0 2px;
+                        }
+                    }
+                }
+
+                .ant-picker-cell {
+                    height: 50px;
+                }
+            }
+        }
+    }
+}
+
+// 如果需要更紧凑的日历，可以添加这个类
+.calendar-compact {
+    .ant-calendar {
+        .ant-picker-cell {
+            height: 50px;
+        }
+
+        .ant-picker-calendar-date-content {
+            min-height: 40px;
+            height: 40px;
+        }
+
+        .calendar-cell {
+            max-height: 36px;
+        }
+    }
+}

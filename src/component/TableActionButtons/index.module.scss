@@ -1,0 +1,28 @@
+.action-wrapper {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    &:not(.action-wrapper_wrap) {
+        flex-direction: row;
+        align-items: center;
+
+        > * {
+            margin: 0;
+            padding: 0;
+            line-height: 1;
+            height: initial;
+
+            &:not(:last-child)::after {
+                content: '|';
+                color: #f0f0f0;
+                display: flex;
+                align-items: center;
+            }
+
+            &:not(:first-child)::before {
+                content: '';
+            }
+        }
+    }
+}

@@ -1,0 +1,28 @@
+.search-row {
+    display: flex;
+    margin-bottom: 2rem;
+
+    .search-row__item {
+        display: flex;
+        align-items: center;
+
+        .search-item__title {
+            font-size: 1.4rem;
+            margin-right: 0.6rem;
+
+            &::after {
+                content: '：';
+            }
+        }
+
+        .search-item__content {
+            .select-not-radius {
+                border-radius: 0;
+            }
+        }
+
+        + .search-row__item {
+            margin-left: 2rem;
+        }
+    }
+}
