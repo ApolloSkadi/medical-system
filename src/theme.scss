@@ -1,0 +1,57 @@
+// 基础背景
+$base-bg: #fafafa;
+$base-bg_dark: #050505;
+// 基础字体色（暗色沿用antd的暗色）
+$base-font: white;
+$base-font_dark: #dddede;
+// 块元素背景色（暗色沿用antd的暗色）
+$block-bg: white;
+$block-bg_dark: #141414;
+// 差色背景1（登录页面底部）
+$contrast-bg: #3d3d3d;
+$contrast-bg_dark: #1e1e1e;
+// 差色背景2（选择按钮背景、订单列表背景）
+$contrast-bg-2: #f5f5f5;
+$contrast-bg-2_dark: #3c3c3c;
+
+// 白色背景
+.theme-bg-white {
+    @apply bg-white dark:bg-[#{'' + $block-bg_dark}];
+}
+// 白色字体
+.theme-text-white {
+    @apply text-[#{'' + $base-font}] dark:text-[#{'' + $base-font_dark}];
+}
+// 黑色字体
+.theme-text-333 {
+    @apply text-[#333] dark:text-[#dedede];
+}
+// 基础背景
+.theme-base-bg {
+    @apply bg-[#{'' + $base-bg}] dark:bg-[#{'' + $base-bg_dark}];
+}
+// 基础边框颜色
+.theme-border-color {
+    @apply border-[#f2f2f2] dark:border-[#3c3c3c];
+}
+// 差色背景
+.theme-contrast-bg {
+    @apply bg-[#{'' + $contrast-bg}] dark:bg-[#{'' + $contrast-bg_dark}];
+}
+// 差色背景2
+.theme-contrast-bg-2 {
+    @apply bg-[#{'' + $contrast-bg-2}] dark:bg-[#{'' + $contrast-bg-2_dark}];
+}
+// 边框背景1
+.theme-border-f3 {
+    @apply border-[#f3f3f3] dark:border-[#303030];
+}
+// f3f3f3 背景色
+.theme-bg-f3 {
+    @apply bg-[#f3f3f3] dark:bg-[#303030];
+}
+.antd-select-disabled {
+    .theme-contrast-bg-2 {
+        @apply dark:bg-[#313131]
+    }
+}

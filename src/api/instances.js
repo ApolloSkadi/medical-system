@@ -1,4 +1,4 @@
-import {baseAfterFilter, baseBeforeFilter, baseErrorHandle} from "@/api/request.js";
+import {baseAfterFilter, baseBeforeFilter, baseErrorHandle} from "@/api/request.jsx";
 import axios from "axios";
 
 const defaultBaseOptions = {

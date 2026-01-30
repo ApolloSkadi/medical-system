@@ -3,6 +3,8 @@ import {Button, Checkbox, Form, Input, message} from 'antd';
 import './index.scss';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import {SystemLogin} from "@/api/system/home/index.js";
+import useAuthStore from "@/store/useAuthStore.js";
 
 
 export default () => {
@@ -20,12 +22,17 @@ export default () => {
             [name]: value
         });
     };
+    const userLogin = useAuthStore().login;
     // 登录按钮
     const loginSubmit = () => {
         setLoading(true)
         const cancelLogin = () => {
             setLoading(false)
         }
+        SystemLogin(formData).then(res => {
+            message.success('登录成功')
+            userLogin({token:res.data.token, userInfo:res.data, role:res.data.role}, navigate)
+        }).finally(cancelLogin)
     }
 
     return (

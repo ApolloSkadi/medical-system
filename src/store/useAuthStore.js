@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import {createJSONStorage, persist} from 'zustand/middleware'
 import {useMenuStore} from "@/store/menu.js";
 import {getAuthRecord} from "@/utils/handler.jsx";
 
@@ -16,19 +16,24 @@ const useAuthStore = create(
             ...initialState,
 
             // ===== 方法 =====
-            login: ({ token, userInfo, role }) => {
+            login: ({ token, userInfo, role }, navigate) => {
                 set({
                     token,
                     userInfo,
                     role
                 })
                 const menuList = getAuthRecord(role)
-                useMenuStore().setMenuList(menuList ?? [])
+                const menuState = useMenuStore.getState()
+                menuState.setMenuList(menuList ?? [])
+                console.log('准备跳转主页')
+                navigate('/dashboard')
             },
 
-            logout: () => {
+            logout: navigate => {
                 set(initialState)
-                useMenuStore().setMenuList([])
+                const menuState = useMenuStore.getState()
+                menuState.setMenuList([])
+                navigate('/login')
             }
         }),
         {
@@ -37,7 +42,8 @@ const useAuthStore = create(
                 token: state.token,
                 userInfo: state.userInfo,
                 role: state.role
-            })
+            }),
+            storage: createJSONStorage(() => sessionStorage)
         }
     )
 )

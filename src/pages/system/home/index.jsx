@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {Calendar, Badge, List, Card, Tag, Modal, Button, Row, Col, Statistic} from 'antd';
 import { CalendarOutlined, UserOutlined, TeamOutlined } from '@ant-design/icons';
 import './index.scss'
+import {FollowCalendar} from "@/api/system/home/index.js";
 
 export default () => {
     const [followSituation, setFollowSituation] = useState({

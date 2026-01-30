@@ -1,0 +1,76 @@
+.header{
+    display: flex;
+    justify-content: right;
+    .h-avatar{
+        margin-right: 2rem;
+    }
+}
+
+.avatar-content{
+    width: 250px;
+    padding: 10px;
+    overflow: hidden;
+    position: relative;
+    border-radius: 10px;
+    z-index: 999;
+    .avatar-bg{
+        display: flex;
+        justify-content: left;
+        .avatar-img{
+            margin-right: 2rem;
+        }
+        .avatar-info{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            .info-usename{
+                font-size: 18px;
+                font-weight: bold;
+            }
+            .info-rolename{
+            }
+        }
+        
+    }
+    .avatar-btn{
+        margin: 0 auto;
+        width: 200px;
+        margin-top: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .avatar-account{
+        .avatar-account-item{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 0.5rem 0;
+            .avatar-account-name{
+                margin-left: 0.5rem;
+            }
+        }   
+    }
+}
+
+.sidebar {
+    .logo{
+        margin: auto;
+        padding: 10px;
+        width: 100px;
+        color: white;
+        text-align: center;
+        font-weight: bold;
+        font-size: 20px;
+        img{
+            width: 100px;
+        }
+    }
+}
+
+.main-content {
+    margin: 1rem;
+    background-color: #ffffff;
+    padding: 1rem;
+    border-radius: 0.5rem;
+}

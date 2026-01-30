@@ -1,12 +1,24 @@
-import { StrictMode } from 'react'
+import dayjs from 'dayjs';
+import 'dayjs/locale/zh-cn';
+import './index.scss'
+import 'tailwindcss/tailwind.css'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter } from 'react-router-dom'
-import RouterView from '@/router'
+import { RouterProvider} from 'react-router-dom'
+import routes from '@/router'
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
+import duration from 'dayjs/plugin/duration'
+import isBetween from 'dayjs/plugin/isBetween'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
+
+dayjs.locale('zh-cn');
+// 继承插件
+dayjs.extend(isSameOrAfter)
+dayjs.extend(isSameOrBefore)
+dayjs.extend(duration)
+dayjs.extend(isBetween)
+dayjs.extend(customParseFormat)
 
 createRoot(document.getElementById('root')).render(
-    <StrictMode>
-        <BrowserRouter>
-            <RouterView />
-        </BrowserRouter>
-    </StrictMode>
+    <RouterProvider router={routes}/>
 )

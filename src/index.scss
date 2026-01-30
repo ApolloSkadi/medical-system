@@ -1,0 +1,206 @@
+@import "./theme";
+
+@font-face {
+    font-family: 'AlimamaFangYuanTiVF';
+    src: url('/src/assets/font/AlimamaFangYuanTiVF-Thin.woff2');
+    font-weight: 500;
+}
+
+body {
+    @extend .theme-base-bg;
+    transition: color .2s, background-color .2s;
+}
+.box-scrollbar {
+    &::-webkit-scrollbar-track-piece {
+        background-color: #f8f8f800;
+    }
+
+    &::-webkit-scrollbar {
+        width: .6rem;
+        height: .6rem;
+        transition: all 2s;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: #dddddd;
+        border-radius: 10rem;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        background-color: #bbb;
+    }
+
+    &::-webkit-scrollbar-corner {
+        background-color: rgba(255, 255, 255, 0);
+    }
+}
+// 公共样式
+* {
+    @apply m-0 p-0;
+    @extend .box-scrollbar;
+    font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif !important;
+}
+
+// 约定rem单位
+html {
+    @apply text-[10px];
+}
+
+.not-border.ant-menu {
+    border: none !important;
+
+    > .ant-menu-item {
+        padding: 0 2.4rem !important;
+        margin-top: 0;
+        margin-left: 0;
+        margin-right: 0;
+        border-radius: 0;
+        width: 100%;
+    }
+}
+
+// 样式隐藏元素
+.disable-element {
+    opacity: 0;
+    pointer-events: none;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+    position: relative;
+    z-index: -999;
+}
+
+// 修改一键复制布局偏移
+.ant-typography, .ant-typography p {
+    margin-bottom: 0 !important;
+}
+
+// 用于Tree组件前面的箭头水平垂直居中
+.ant-tree.ant-tree__arrow-center {
+    .ant-tree-switcher {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .ant-tree-checkbox {
+        margin-top: 0;
+        align-self: center;
+    }
+}
+
+// modal滚动条
+.ant-modal.ant-model_scroll {
+    .ant-modal-body {
+        max-height: max(75vh, 75rem);
+        overflow-y: auto;
+        padding-right: 1.2rem
+    }
+}
+
+.ant-table-head__small th.ant-table-cell {
+    padding: 6px !important;
+}
+
+.fade-enter {
+    opacity: 0;
+}
+
+.fade-enter-active {
+    opacity: 1;
+    transition: opacity cubic-bezier(.67, -0.01, .29, 1) .4s;
+}
+
+.fade-exit {
+    opacity: 1;
+}
+
+.fade-exit-active {
+    opacity: 0;
+    transition: opacity cubic-bezier(.29, .86, .88, .97) .4s;
+}
+
+// 修改全屏提示背景样式
+.ant-spin-fullscreen {
+    background-color: rgba(70, 70, 70, .45);
+}
+
+// 修改菜单放置动画
+.ant-menu.ant-menu_hover {
+    will-change: transform, font-size;
+    .ant-menu-item {
+        padding: 0 0 0 1rem;
+
+        > span svg {
+            transition: font-size ease .2s;
+        }
+    }
+    .ant-menu-item-selected, .ant-menu-item-active {
+        > span svg {
+            font-size: 1.8rem;
+        }
+    }
+}
+.ant-layout-sider.ant-layout-sider-collapsed {
+    .ant-menu.ant-menu_hover {
+        will-change: transform, font-size;
+
+        .ant-menu-item {
+            padding: 0 15.5px;
+
+            > span svg {
+                transition: transform ease .2s;
+            }
+        }
+
+        .ant-menu-item-selected, .ant-menu-item-active {
+            > span svg {
+                transform: scale(1.1);
+            }
+        }
+    }
+}
+
+// 全局页签样式
+.ant-tabs.page-tabs {
+    overflow: hidden;
+    .ant-tabs-nav {
+        margin-bottom: 0;
+    }
+}
+
+// 全局表格响应式样式
+.ant-table-wrapper table {
+    //width: clamp(120rem, 100% , 100%);
+}
+// 适配少内容表格（表格宽度120rem左右）
+.ant-table__middle table {
+    width: clamp(100rem, 100%, 120rem);
+}
+// 适配少内容表格（表格宽度70rem左右）
+.ant-table__small table {
+    width: clamp(60rem, 100% , 70rem);
+}
+// 适用特小尺寸
+.ant-table__full table {
+    width: 100%;
+}
+
+
+// 面包屑中不换行
+.ant-breadcrumb ol {
+    flex-wrap: nowrap;
+
+    li {
+        white-space: nowrap;
+    }
+}
+
+// 日历左侧日期
+.ant-picker-calendar__text-left {
+    .ant-picker-calendar-date-value {
+        text-align: left;
+    }
+}

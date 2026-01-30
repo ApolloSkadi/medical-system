@@ -1,6 +1,6 @@
 import {message} from "antd";
 import useAuthStore from "@/store/useAuthStore.js";
-import {routes} from "@/router/index.jsx";
+import routes from "@/router/system";
 
 // 判断数组是否有值
 export const isNotNullArray = object => !!(Array.isArray(object) && object.filter(v => v).length)
