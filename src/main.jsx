@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import 'dayjs/locale/zh-cn';
-import './index.scss'
 import 'tailwindcss/tailwind.css'
+import './index.scss'
 import { createRoot } from 'react-dom/client'
 import { RouterProvider} from 'react-router-dom'
 import routes from '@/router'

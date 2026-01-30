@@ -1,5 +1,4 @@
 import SearchRow from "@/component/SearchRow/index.jsx";
-import BaseAntdInput from "@/component/BaseAntdInput/index.jsx";
 import BaseAntdTable from "@/component/BaseAntdTable/index.jsx";
 import {useRef, useState} from "react";
 import CopyText from "@/component/CopyText/index.jsx";
@@ -8,6 +7,7 @@ import PatientEditModal from "@/pages/system/patient/components/PatientEditModal
 import TableActionButtons from "@/component/TableActionButtons/index.jsx";
 import {Button} from "antd";
 import SearchBtnGroup from "@/component/SearchBtnGroup/index.jsx";
+import { FAntdInput } from 'izid'
 
 export default () => {
     // 接口查询参数
@@ -64,10 +64,7 @@ export default () => {
         <>
             <SearchRow>
                 <SearchRow.Item title={'患者姓名'}>
-                    <BaseAntdInput
-                        value={patientName}
-                        setValue={setPatientName}
-                    />
+                    <FAntdInput state={[patientName, setPatientName]} />
                 </SearchRow.Item>
             </SearchRow>
             <SearchRow>
