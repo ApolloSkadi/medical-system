@@ -20,7 +20,7 @@ export default ({
                         <div className={'avatar-img'}>
                             <Avatar
                                 size={64}
-                                src={userInfo.gender === '男' ? '/images/dor-man.png' : '/images/dor-weman.png'}
+                                src={userInfo?.gender === '男' ? '/images/dor-man.png' : '/images/dor-weman.png'}
                                 icon={<UserOutlined/>}>
                             </Avatar>
                         </div>
@@ -44,7 +44,7 @@ export default ({
                 </div>
             }
             trigger={'click'}>
-            <Avatar src={userInfo.gender === '男' ? '/images/dor-man.png' : '/images/dor-weman.png'}></Avatar>
+            <Avatar src={userInfo?.gender === '男' ? '/images/dor-man.png' : '/images/dor-weman.png'}></Avatar>
         </Popover>
     )
 }

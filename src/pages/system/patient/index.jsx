@@ -1,6 +1,6 @@
 import SearchRow from "@/component/SearchRow/index.jsx";
 import BaseAntdTable from "@/component/BaseAntdTable/index.jsx";
-import {useRef, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import CopyText from "@/component/CopyText/index.jsx";
 import {PatientPage} from "@/api/system/patient/index.js";
 import PatientEditModal from "@/pages/system/patient/components/PatientEditModal/index.jsx";

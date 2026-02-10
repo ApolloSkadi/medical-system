@@ -12,6 +12,8 @@ export default forwardRef(({
     return (
         <BaseFormModal
             ref={ref}
+            data={formData}
+            setFormData={setFormData}
             addTitle={'新增病人'}
             editTitle={'修改病人'}
             onSubmit={onSubmit}
