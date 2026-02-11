@@ -260,5 +260,16 @@ export default [
                 data: null
             };
         }
+    },
+    {
+        url: '/patient/saveOrEdit',
+        method: 'POST',
+        timeout: 300,
+        response: (req, res) => {
+            return {
+                code: 'OK',
+                data: '操作成功'
+            };
+        }
     }
 ];

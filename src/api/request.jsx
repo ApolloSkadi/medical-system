@@ -4,9 +4,15 @@ import {message} from "antd";
 // 请求拦截器
 export const baseBeforeFilter = req => {
     console.log('url', req.url)
-    if (req.url !== '/login') req.headers.token = useAuthStore().get().token
+    if (req.url !== '/login') {
+        // 使用 zustand 的 getState() 方法在组件外部获取状态
+        const authState = useAuthStore.getState()
+        console.log('authState', authState?.token)
+        req.headers.token = authState?.token || ''
+    }
     if (!req.data) req.data = {};
     if (!req.params) req.params = {};
+    console.log('接口执行 req', req)
     return req;
 }
 // 通用响应拦截器
@@ -15,6 +21,7 @@ export const baseAfterFilter = (resp => {
         response: resp
     })
     if (errorPromise) return errorPromise
+    // 返回后端响应中的 data 字段（实际业务数据）
     return resp.data;
 })
 

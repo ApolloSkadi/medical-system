@@ -69,8 +69,7 @@ export default () => {
     }
     const submitForm = (formValues) => {
         console.log('表单信息', formValues)
-        return PatientSaveOrEdit(formValues)
-        .then(res=> {
+        return PatientSaveOrEdit(formValues).then(res=> {
             message.success(res.data)
         })
     }

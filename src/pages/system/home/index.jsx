@@ -138,7 +138,7 @@ export default () => {
         return FollowCalendar({
             chooseDate: selectedDate
         }).then(res => {
-            setFollowData(res);
+            setFollowData(res.data);
         })
     }
 

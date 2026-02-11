@@ -8,4 +8,4 @@ export const SystemLogin = data => SystemInstance.post('/login', data);
 /**
  * 首页-获取随访日历
  */
-export const FollowCalendar = data => SystemInstance.post('/followCalendar', data);
+export const FollowCalendar = data => SystemInstance.post('/getFollowCalendar', data);
