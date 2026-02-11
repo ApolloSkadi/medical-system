@@ -228,7 +228,7 @@ const generatePageData = (page, pageSize, name) => {
 
 export default [
     {
-        url: '/patient/page',
+        url: '/system/patient/page',
         method: 'POST',
         timeout: 500,
         response: (req, res) => {
@@ -240,7 +240,7 @@ export default [
         }
     },
     {
-        url: '/patient/detail',
+        url: '/system/patient/detail',
         method: 'POST',
         timeout: 300,
         response: (req, res) => {
@@ -262,7 +262,7 @@ export default [
         }
     },
     {
-        url: '/patient/saveOrEdit',
+        url: '/system/patient/saveOrEdit',
         method: 'POST',
         timeout: 300,
         response: (req, res) => {

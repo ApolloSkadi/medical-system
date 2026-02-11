@@ -3,6 +3,7 @@ import BaseFormModal from "@/component/BaseFormModal/index.jsx";
 import {Form, Input, DatePicker, Switch, Row, Col} from "antd";
 import MriEcvCalculate from "@/component/MriEcvCalculate/index.jsx";
 import BaseAntdInput from "@/component/BaseAntdInput/index.jsx";
+import { FAntdInput } from 'izid'
 
 export default forwardRef(({
     formData,
@@ -78,11 +79,13 @@ export default forwardRef(({
                         label={'出生日期'}
                         name={'birthDate'}
                     >
-                        <DatePicker
-                            placeholder="请选择"
-                            style={{width: '100%'}}
-                            allowClear
-                        />
+                        {/* TODO DatePicker组件去看看官方文档，绑定值是dayjs对象，自己改 */}
+                        <FAntdInput />
+                    {/*     <DatePicker */}
+                    {/*         placeholder="请选择" */}
+                    {/*         style={{width: '100%'}} */}
+                    {/*         allowClear */}
+                    {/*     /> */}
                     </Form.Item>
                 </Col>
                 <Col span={12}>
@@ -121,11 +124,13 @@ export default forwardRef(({
                         label={'基线检查日期'}
                         name={'baseCheckDate'}
                     >
-                        <DatePicker
-                            placeholder="请选择"
-                            style={{width: '100%'}}
-                            allowClear
-                        />
+                        {/* TODO 同上 */}
+                        <FAntdInput />
+                        {/* <DatePicker */}
+                        {/*     placeholder="请选择" */}
+                        {/*     style={{width: '100%'}} */}
+                        {/*     allowClear */}
+                        {/* /> */}
                     </Form.Item>
                 </Col>
             </Row>

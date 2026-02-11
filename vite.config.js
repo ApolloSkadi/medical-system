@@ -7,12 +7,12 @@ import {viteMockServe} from "vite-plugin-mock";
 export default defineConfig({
     plugins: [
         react(),
-        // viteMockServe({
-        //     mockPath: 'src/mock',  // 正确指向mock目录
-        //     localEnabled: true,     // 开发环境启用
-        //     watchFiles: true,       // 监听文件变化
-        //     logger: true           // 启用日志
-        // }),
+        viteMockServe({
+            mockPath: 'src/mock',  // 正确指向mock目录
+            localEnabled: true,     // 开发环境启用
+            watchFiles: true,       // 监听文件变化
+            logger: true           // 启用日志
+        }),
     ],
     css: {
         preprocessorOptions: {

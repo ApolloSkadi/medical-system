@@ -53,11 +53,11 @@ export default forwardRef(
                     activeVersion === apiVersion[api.toString()]
                 ) {
                     if (filter) res = filter(res);
-                    
+
                     // 处理响应格式：可能是ResponseInfo对象或直接数据
                     let responseData = res;
                     let totalCount = 0;
-                    
+
                     // 如果是ResponseInfo对象
                     if (res && res.code !== undefined) {
                         if (res.code !== 'OK') {
@@ -69,16 +69,16 @@ export default forwardRef(
                         responseData = res.data;
                         totalCount = res.count ?? 0;
                     }
-                    
+
                     // 处理分页数据：responseData可能是PageResult对象（包含total和rows）或直接数组
                     let tableData = responseData ?? [];
-                    
-                    // 如果responseData是PageResult对象（包含total和rows）
-                    if (tableData && typeof tableData === 'object' && tableData.rows !== undefined) {
+
+                    // 如果responseData是PageResult对象（包含total和rows）TODO 对接你自己的接口参数名称，让你用FAntdTable不用，然后自己也不改。。。。
+                    if (tableData && typeof tableData === 'object' && tableData.list !== undefined) {
                         totalCount = tableData.total ?? totalCount;
-                        tableData = tableData.rows ?? [];
+                        tableData = tableData.list ?? [];
                     }
-                    
+
                     setTotal(totalCount);
                     setTableData(tableData);
                 }
