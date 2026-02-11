@@ -13,6 +13,13 @@ export default createBrowserRouter([
             public: true
         },
         children:[
+            {
+                index: true,
+                element: <Navigate to={Config.LoginPath}/>,
+                meta: {
+                    public: true
+                }
+            },
             ...publicRouter,
             ...systemRouter,
             {
