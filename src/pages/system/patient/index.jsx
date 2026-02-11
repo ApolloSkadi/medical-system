@@ -3,10 +3,10 @@ import BaseAntdTable from "@/component/BaseAntdTable/index.jsx";
 import {useRef, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import CopyText from "@/component/CopyText/index.jsx";
-import {PatientPage} from "@/api/system/patient/index.js";
+import {PatientPage, PatientSaveOrEdit} from "@/api/system/patient/index.js";
 import PatientEditModal from "@/pages/system/patient/components/PatientEditModal/index.jsx";
 import TableActionButtons from "@/component/TableActionButtons/index.jsx";
-import {Button} from "antd";
+import {Button, message} from "antd";
 import SearchBtnGroup from "@/component/SearchBtnGroup/index.jsx";
 import { FAntdInput } from 'izid'
 import {EyeOutlined} from "@ant-design/icons";
@@ -56,6 +56,11 @@ export default () => {
 
         }
     ]
+    const onSearch = () => tableRef.current?.initPageSearch();
+    const toReset = () => {
+        setPatientName(undefined);
+        return tableRef.current?.resetPageSearch();
+    }
     // 病人编辑弹窗
     const baseFormRef = useRef()
     const [formData, setFormData] = useState()
@@ -64,6 +69,10 @@ export default () => {
     }
     const submitForm = (formValues) => {
         console.log('表单信息', formValues)
+        return PatientSaveOrEdit(formValues)
+        .then(res=> {
+            message.success(res.data)
+        })
     }
     
     // 跳转到详情页
@@ -77,11 +86,13 @@ export default () => {
                 <SearchRow.Item title={'患者姓名'}>
                     <FAntdInput state={[patientName, setPatientName]} />
                 </SearchRow.Item>
-            </SearchRow>
-            <SearchRow>
-                <SearchBtnGroup
-                    onAdd={openPatientModal}
-                />
+                <SearchRow.Item>
+                    <SearchBtnGroup
+                        onSearch={onSearch}
+                        onReset={toReset}
+                        onAdd={openPatientModal}
+                    />
+                </SearchRow.Item>
             </SearchRow>
             <BaseAntdTable
                 api={PatientPage}

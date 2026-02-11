@@ -1,0 +1,5 @@
+import {FollowInstance} from "@/api/instances.js";
+// 查询随访列表
+export const FollowPage = data => FollowInstance.post("/page", data)
+// 随访信息添加修改
+export const FollowSaveOrEdit = data => FollowInstance.post("/saveOrEdit", data)

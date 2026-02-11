@@ -1,10 +1,13 @@
-import { useEffect, useState } from "react";
+import {use, useEffect, useRef, useState} from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Descriptions, Card, Divider, Breadcrumb, Button, Spin, message } from "antd";
-import { HomeOutlined, TeamOutlined, UserOutlined } from "@ant-design/icons";
+import {EyeOutlined, HomeOutlined, TeamOutlined, UserOutlined} from "@ant-design/icons";
 import { PatientPage } from "@/api/system/patient/index.js";
 import { PatientDetail } from "@/api/system/patient/index.js";
 import { set } from "lodash-es";
+import BaseAntdTable from "@/component/BaseAntdTable/index.jsx";
+import TableActionButtons from "@/component/TableActionButtons/index.jsx";
+import {FollowPage} from "@/api/system/follow/index.js";
 
 export default () => {
     const navigate = useNavigate();
@@ -19,7 +22,7 @@ export default () => {
         }
     }, [id]);
 
-    const fetchPatientDetail = async () => {
+    const fetchPatientDetail = () => {
         setLoading(true);
         PatientDetail({id}).then(res => {
             setData(res.data);
@@ -46,6 +49,53 @@ export default () => {
         if (value === false || value === 0 || value === '0') return '无';
         return '-';
     };
+
+    // 随访记录列表
+    const tableRef = useRef();
+    const columns = [
+        {
+            title: '随访类型',
+            dataIndex: 'followupType',
+            render(value) {
+
+            }
+        },
+        {
+            title: '随访体重',
+            dataIndex: 'followupWeight',
+            key: 'followupWeight',
+        },
+        {
+            title:'预计随访时间',
+            dataIndex: 'expectedFollowupDate',
+            key: 'expectedFollowupDate',
+        },
+        {
+            title:'实际随访时间',
+            dataIndex: 'actualFollowupDate',
+            key: 'actualFollowupDate',
+        },
+        {
+            title: '操作',
+            dataIndex: 'active',
+            render(_, row) {
+                return <TableActionButtons>
+                    <Button type={'link'} onClick={() =>openFollowModal(row)}>
+                        编辑
+                    </Button>
+                </TableActionButtons>
+            }
+        }
+    ]
+    // 随访记录弹窗
+    const baseFormRef = useRef()
+    const [formData, setFormData] = useState()
+    const openFollowModal = (row= {}) => {
+
+    }
+    const submitForm = (formValues) => {
+
+    }
 
     return (
         <div className="p-4">
@@ -155,6 +205,18 @@ export default () => {
                     <Descriptions.Item label="既往病史">{formatSwitch(data?.medicalHistory)}</Descriptions.Item>
                     <Descriptions.Item label="金属植入史">{formatSwitch(data?.metalImplantHistory)}</Descriptions.Item>
                 </Descriptions>
+                {/* 随访记录列表 */}
+                <Card title="随访记录" size="small" className="mb-4">
+                    <Button>新增</Button>
+                    <BaseAntdTable
+                        api={FollowPage}
+                        apiData={{
+                            patientId: id
+                        }}
+                        ref={tableRef}
+                        columns={columns}
+                    />
+                </Card>
             </Spin>
         </div>
     );

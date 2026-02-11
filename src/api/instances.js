@@ -23,6 +23,8 @@ const createAxiosInstance = (baseOptions, {
 // 系统接口
 export const SystemInstance = createAxiosInstance({baseURL: '/system'})
 // 用户接口
-export const UserInstance = createAxiosInstance({baseURL: '/user'})
+export const UserInstance = createAxiosInstance({baseURL: '/system/user'})
 // 病人接口
-export const PatientInstance = createAxiosInstance({baseURL: '/patient'})
+export const PatientInstance = createAxiosInstance({baseURL: '/system/patient'})
+// 随访接口
+export const FollowInstance = createAxiosInstance({baseURL: '/system/follow'})

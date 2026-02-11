@@ -134,6 +134,7 @@ export default () => {
     },[selectedDate])
     // 获取随访日历数据
     const getCalendar = () => {
+        console.log('获取随访数据')
         return FollowCalendar({
             chooseDate: selectedDate
         }).then(res => {

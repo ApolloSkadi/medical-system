@@ -20,6 +20,9 @@ export const getAuthRecord = (role = useAuthStore().get().role) => {
         if (route.meta?.requiresAuth) {
             if (isNotNullArray(route.children)) {
                 route.children.forEach((item) => {
+                    if (item.meta?.hidden) {
+                        return
+                    }
                     if (item.meta.roles.includes(role)) {
                         menuList.push({
                             path: route.path + item.path,
