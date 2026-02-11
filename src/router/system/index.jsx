@@ -2,6 +2,7 @@ import { HomeOutlined, TeamOutlined,MedicineBoxOutlined} from '@ant-design/icons
 import Main from "@/pages/system";
 import Home from '@/pages/system/home';
 import Patient from '@/pages/system/patient';
+import PatientDetail from '@/pages/system/patient/detail';
 import User from '@/pages/system/user';
 export default [{
     path: '/',
@@ -26,6 +27,16 @@ export default [{
                 title: '患者管理',
                 icon: 'MedicineBoxOutlined',
                 roles: ['admin', 'user']
+            }
+        },
+        {
+            path: 'patient/detail/:id',
+            element: <PatientDetail/>,
+            meta: {
+                title: '患者详情',
+                icon: 'MedicineBoxOutlined',
+                roles: ['admin', 'user'],
+                hidden: true
             }
         },
         {

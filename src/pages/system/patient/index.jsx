@@ -1,6 +1,7 @@
 import SearchRow from "@/component/SearchRow/index.jsx";
 import BaseAntdTable from "@/component/BaseAntdTable/index.jsx";
-import {useEffect, useRef, useState} from "react";
+import {useRef, useState} from "react";
+import {useNavigate} from "react-router-dom";
 import CopyText from "@/component/CopyText/index.jsx";
 import {PatientPage} from "@/api/system/patient/index.js";
 import PatientEditModal from "@/pages/system/patient/components/PatientEditModal/index.jsx";
@@ -9,9 +10,9 @@ import {Button} from "antd";
 import SearchBtnGroup from "@/component/SearchBtnGroup/index.jsx";
 import { FAntdInput } from 'izid'
 import {EyeOutlined} from "@ant-design/icons";
-import PatientDetail from "@/pages/system/patient/components/PatientDetail/index.jsx";
 
 export default () => {
+    const navigate = useNavigate();
     // 接口查询参数
     const [patientName, setPatientName] = useState();
     // 病人列表相关
@@ -47,10 +48,9 @@ export default () => {
                     <Button type={'link'} onClick={() => openPatientModal(row)}>
                         编辑
                     </Button>
-                    <Button type={'link'} icon={<EyeOutlined />} onClick={() => {
-                        console.log('查看详情', row)
-                        detailRef.current?.open()
-                    }}>详情</Button>
+                    <Button type={'link'} icon={<EyeOutlined />} onClick={() => handleViewDetail(row)}>
+                        详情
+                    </Button>
                 </TableActionButtons>
             }
 
@@ -65,8 +65,12 @@ export default () => {
     const submitForm = (formValues) => {
         console.log('表单信息', formValues)
     }
-    // 病人详情弹窗
-    const detailRef = useRef()
+    
+    // 跳转到详情页
+    const handleViewDetail = (row) => {
+        navigate(`/patient/detail/${row.id}`);
+    }
+    
     return (
         <>
             <SearchRow>
@@ -93,10 +97,6 @@ export default () => {
                 formData={formData}
                 setFormData={setFormData}
                 onSubmit={submitForm}
-            />
-            {/* 病人详情 */}
-            <PatientDetail
-                ref={detailRef}
             />
         </>
     );
