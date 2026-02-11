@@ -39,19 +39,19 @@ export default ({ formData, setFormData }) => {
             // 记录当前输入值
             prevCalculationRef.current = currentInputKey;
             
-            // 计算 ECV 值
+            // 计算 ECV 值 保留两位小数
             const ecv = (1 - checkMriHct / 100) * 
                 (1 / checkMriRightPost - 1 / checkMriBloodPost) / 
                 (1 / checkMriRightNative - 1 / checkMriBloodNative);
             
             // 更新表单中的 ECV 字段
-            form.setFieldValue('checkMriEcv', ecv);
+            form.setFieldValue('checkMriEcv',ecv ? ecv.toFixed(2) : undefined);
             
             // 同时更新父组件的状态
             if (setFormData) {
                 setFormData((data) => ({
                     ...data,
-                    checkMriEcv: ecv
+                    checkMriEcv: ecv ? ecv.toFixed(2) : undefined
                 }));
             }
         }

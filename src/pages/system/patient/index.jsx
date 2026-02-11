@@ -3,13 +3,15 @@ import BaseAntdTable from "@/component/BaseAntdTable/index.jsx";
 import {useRef, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import CopyText from "@/component/CopyText/index.jsx";
-import {PatientPage, PatientSaveOrEdit} from "@/api/system/patient/index.js";
+import {PatientCreate, PatientDel, PatientPage, PatientSaveOrEdit} from "@/api/system/patient/index.js";
 import PatientEditModal from "@/pages/system/patient/components/PatientEditModal/index.jsx";
 import TableActionButtons from "@/component/TableActionButtons/index.jsx";
 import {Button, message} from "antd";
 import SearchBtnGroup from "@/component/SearchBtnGroup/index.jsx";
 import { FAntdInput } from 'izid'
 import {EyeOutlined} from "@ant-design/icons";
+import dayjs from "dayjs";
+import BasePopconfirm from "@/component/BasePopconfirm/index.jsx";
 
 export default () => {
     const navigate = useNavigate();
@@ -30,7 +32,24 @@ export default () => {
         },
         {
             title:'门诊号',
-            dataIndex: 'phone',
+            dataIndex: 'outpatientNo',
+            key: 'outpatientNo',
+            render(value) {
+                return <CopyText>{value}</CopyText>
+            }
+        },
+        {
+            title:'住院号',
+            dataIndex: 'inpatientNo',
+            key: 'inpatientNo',
+            render(value) {
+                return <CopyText>{value}</CopyText>
+            }
+        },
+        {
+            title:'基线检查日期',
+            dataIndex: 'baseCheckDate',
+            key: 'baseCheckDate',
         },
         {
             title: '联系电话',
@@ -51,6 +70,7 @@ export default () => {
                     <Button type={'link'} icon={<EyeOutlined />} onClick={() => handleViewDetail(row)}>
                         详情
                     </Button>
+                    <BasePopconfirm onConfirm={() => submitDel(row)} />
                 </TableActionButtons>
             }
 
@@ -65,12 +85,24 @@ export default () => {
     const baseFormRef = useRef()
     const [formData, setFormData] = useState()
     const openPatientModal = (row = {}) => {
-        baseFormRef.current?.open(row)
+        baseFormRef.current?.open({
+            ...row,
+            birthDate: row?.birthDate ? dayjs(row?.birthDate) : undefined,
+            baseCheckDate: row?.baseCheckDate ? dayjs(row?.baseCheckDate) : undefined,
+        })
     }
     const submitForm = (formValues) => {
-        console.log('表单信息', formValues)
-        return PatientSaveOrEdit(formValues).then(res=> {
+        return PatientSaveOrEdit(formValues).then(res => {
             message.success(res.data)
+            baseFormRef.current?.close()
+            tableRef.current?.getTableData();
+        })
+    }
+    // 删除病人信息
+    const submitDel = data => {
+        return PatientDel(data).then(res => {
+            message.success(res.data)
+            tableRef.current?.getTableData();
         })
     }
     

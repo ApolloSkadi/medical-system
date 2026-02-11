@@ -4,6 +4,8 @@ import {Form, Input, DatePicker, Switch, Row, Col} from "antd";
 import MriEcvCalculate from "@/component/MriEcvCalculate/index.jsx";
 import BaseAntdInput from "@/component/BaseAntdInput/index.jsx";
 import { FAntdInput } from 'izid'
+import Constant from "@/utils/Constant.jsx";
+import BaseAntdSelect from "@/component/BaseAntdSelect/index.jsx";
 
 export default forwardRef(({
     formData,
@@ -33,7 +35,7 @@ export default forwardRef(({
                         label={'性别'}
                         name={'gender'}
                     >
-                        <BaseAntdInput/>
+                        <BaseAntdSelect data={Constant.GenderOptions}/>
                     </Form.Item>
                 </Col>
             </Row>
@@ -79,13 +81,11 @@ export default forwardRef(({
                         label={'出生日期'}
                         name={'birthDate'}
                     >
-                        {/* TODO DatePicker组件去看看官方文档，绑定值是dayjs对象，自己改 */}
-                        <FAntdInput />
-                    {/*     <DatePicker */}
-                    {/*         placeholder="请选择" */}
-                    {/*         style={{width: '100%'}} */}
-                    {/*         allowClear */}
-                    {/*     /> */}
+                         <DatePicker
+                             placeholder="请选择"
+                             style={{width: '100%'}}
+                             allowClear
+                         />
                     </Form.Item>
                 </Col>
                 <Col span={12}>
@@ -124,13 +124,11 @@ export default forwardRef(({
                         label={'基线检查日期'}
                         name={'baseCheckDate'}
                     >
-                        {/* TODO 同上 */}
-                        <FAntdInput />
-                        {/* <DatePicker */}
-                        {/*     placeholder="请选择" */}
-                        {/*     style={{width: '100%'}} */}
-                        {/*     allowClear */}
-                        {/* /> */}
+                         <DatePicker
+                             placeholder="请选择"
+                             style={{width: '100%'}}
+                             allowClear
+                         />
                     </Form.Item>
                 </Col>
             </Row>

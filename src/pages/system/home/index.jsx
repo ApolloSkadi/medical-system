@@ -1,10 +1,15 @@
 import React, {useEffect, useState} from 'react';
-import {Calendar, Badge, List, Card, Tag, Modal, Button, Row, Col, Statistic} from 'antd';
+import {Calendar, Badge, List, Card, Tag, Modal, Button, Row, Col, Statistic, Dropdown, message} from 'antd';
 import { CalendarOutlined, UserOutlined, TeamOutlined } from '@ant-design/icons';
 import './index.scss'
-import {FollowCalendar} from "@/api/system/home/index.js";
+import {FollowCalendar, FollowSituation} from "@/api/system/home/index.js";
+import StatusLabel from "@/component/StatusLabel/index.jsx";
+import Constant from "@/utils/Constant.jsx";
+import {useNavigate} from "react-router-dom";
+import {FollowChangeStatus} from "@/api/system/follow/index.js";
 
 export default () => {
+    const navigate = useNavigate();
     const [followSituation, setFollowSituation] = useState({
         totalCount: 0,
         followCount: 0,
@@ -12,7 +17,9 @@ export default () => {
     });
     // todo 获取随访情况
     const getSituation = () => {
-
+        return FollowSituation().then((res) => {
+            setFollowSituation(res.data);
+        })
     }
 
     useEffect(() => {
@@ -141,6 +148,21 @@ export default () => {
             setFollowData(res.data);
         })
     }
+    // 查看详情
+    const patientDetail = (id) => {
+        navigate(`/patient/detail/${id}`);
+    }
+    const changeStatus = (id, status) => {
+        return FollowChangeStatus({
+            id: id,
+            status: status
+        }).then(res => {
+            message.success(res.data);
+            getSituation();
+            getCalendar();
+        })
+    }
+
 
     return (
         <div style={{padding: 10, background: '#fff'}} className={'home'}>
@@ -222,8 +244,9 @@ export default () => {
                             renderItem={item => (
                                 <List.Item
                                     actions={[
-                                        <Button type="link" size="small">查看详情</Button>,
-                                        <Button type="link" size="small">编辑</Button>
+                                        <Button type="link" size="small" onClick={()=>patientDetail(item?.patientId)}>查看详情</Button>,
+                                        item?.status === 2 && <Button type="link" size="small" onClick={() => changeStatus(item?.id, 1)}>完成随访</Button>,
+                                        item?.status === 2 && <Button type="link" size="small" onClick={() => changeStatus(item?.id, -1)}>取消随访</Button>
                                     ]}
                                 >
                                     <List.Item.Meta

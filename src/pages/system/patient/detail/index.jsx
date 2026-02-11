@@ -1,13 +1,24 @@
 import {use, useEffect, useRef, useState} from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Descriptions, Card, Divider, Breadcrumb, Button, Spin, message } from "antd";
-import {EyeOutlined, HomeOutlined, TeamOutlined, UserOutlined} from "@ant-design/icons";
+import {Descriptions, Card, Divider, Breadcrumb, Button, Spin, message, Row, Col, Flex} from "antd";
+import {
+    EyeOutlined,
+    HomeOutlined,
+    PlusOutlined,
+    RedoOutlined,
+    ReloadOutlined,
+    TeamOutlined,
+    UserOutlined
+} from "@ant-design/icons";
 import { PatientPage } from "@/api/system/patient/index.js";
 import { PatientDetail } from "@/api/system/patient/index.js";
 import { set } from "lodash-es";
 import BaseAntdTable from "@/component/BaseAntdTable/index.jsx";
 import TableActionButtons from "@/component/TableActionButtons/index.jsx";
-import {FollowPage} from "@/api/system/follow/index.js";
+import {FollowPage, FollowSaveOrEdit} from "@/api/system/follow/index.js";
+import FollowEditModal from "@/pages/system/patient/components/FollowEditModal/index.jsx";
+import dayjs from "dayjs";
+import SearchRow from "@/component/SearchRow/index.jsx";
 
 export default () => {
     const navigate = useNavigate();
@@ -47,7 +58,7 @@ export default () => {
     const formatSwitch = (value) => {
         if (value === true || value === 1 || value === '1') return '有';
         if (value === false || value === 0 || value === '0') return '无';
-        return '-';
+        return '无';
     };
 
     // 随访记录列表
@@ -91,10 +102,18 @@ export default () => {
     const baseFormRef = useRef()
     const [formData, setFormData] = useState()
     const openFollowModal = (row= {}) => {
-
+        baseFormRef.current?.open({
+            ...row,
+            actualFollowupDate: row?.actualFollowupDate ? dayjs(row?.actualFollowupDate) : undefined,
+            expectedFollowupDate: row?.expectedFollowupDate ? dayjs(row.expectedFollowupDate) : undefined,
+        })
     }
-    const submitForm = (formValues) => {
-
+    const submitForm = (data) => {
+        return FollowSaveOrEdit(data).then(res => {
+            message.success(res.data);
+            baseFormRef.current?.close()
+            tableRef.current?.getTableData();
+        })
     }
 
     return (
@@ -116,16 +135,16 @@ export default () => {
                 ]}
                 className="mb-4"
             />
-
-            {/* 返回按钮 */}
-            <Button 
-                type="primary" 
-                onClick={handleBack}
-                className="mb-4"
-            >
-                返回列表
-            </Button>
-
+            <Flex justify={'flex-end'} align={'center'} className="mb-4">
+                {/*/!* 返回按钮 *!/*/}
+                <Button
+                    type="primary"
+                    onClick={handleBack}
+                    className="mb-4"
+                >
+                    返回列表
+                </Button>
+            </Flex>
             <Spin spinning={loading}>
                 {/* 基本信息 */}
                 <Descriptions
@@ -155,9 +174,10 @@ export default () => {
                     column={1}
                     size="small"
                     className="mb-4"
+                    layout="vertical"
                 >
-                    <Descriptions.Item label="主要诊断">{data?.mainDiagnosis || '-'}</Descriptions.Item>
-                    <Descriptions.Item label="次要诊断">{data?.secondDiagnosis || '-'}</Descriptions.Item>
+                    <Descriptions.Item label="主要诊断" >{data?.mainDiagnosis || '-'}</Descriptions.Item>
+                    <Descriptions.Item label="次要诊断" >{data?.secondDiagnosis || '-'}</Descriptions.Item>
                 </Descriptions>
 
                 <Divider />
@@ -205,9 +225,17 @@ export default () => {
                     <Descriptions.Item label="既往病史">{formatSwitch(data?.medicalHistory)}</Descriptions.Item>
                     <Descriptions.Item label="金属植入史">{formatSwitch(data?.metalImplantHistory)}</Descriptions.Item>
                 </Descriptions>
+
+                <Divider />
+
                 {/* 随访记录列表 */}
                 <Card title="随访记录" size="small" className="mb-4">
-                    <Button>新增</Button>
+                    <Flex justify={'flex-end'} align={'center'} className="mb-4">
+                        <Button className="mr-2" icon={<ReloadOutlined />} onClick={() => tableRef.current?.initPageSearch()}>刷新</Button>
+                        <Button type={'primary'} icon={<PlusOutlined />} onClick={() => openFollowModal({
+                            patientId: id
+                        })}>新增</Button>
+                    </Flex>
                     <BaseAntdTable
                         api={FollowPage}
                         apiData={{
@@ -218,6 +246,13 @@ export default () => {
                     />
                 </Card>
             </Spin>
+            {/*  随访弹窗  */}
+            <FollowEditModal
+                ref={baseFormRef}
+                data={formData}
+                setData={setFormData}
+                onSubmit={submitForm}
+            />
         </div>
     );
 };
