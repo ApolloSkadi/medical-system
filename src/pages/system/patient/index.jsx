@@ -8,6 +8,8 @@ import TableActionButtons from "@/component/TableActionButtons/index.jsx";
 import {Button} from "antd";
 import SearchBtnGroup from "@/component/SearchBtnGroup/index.jsx";
 import { FAntdInput } from 'izid'
+import {EyeOutlined} from "@ant-design/icons";
+import PatientDetail from "@/pages/system/patient/components/PatientDetail/index.jsx";
 
 export default () => {
     // 接口查询参数
@@ -45,21 +47,26 @@ export default () => {
                     <Button type={'link'} onClick={() => openPatientModal(row)}>
                         编辑
                     </Button>
+                    <Button type={'link'} icon={<EyeOutlined />} onClick={() => {
+                        console.log('查看详情', row)
+                        detailRef.current?.open()
+                    }}>详情</Button>
                 </TableActionButtons>
             }
 
         }
     ]
-
+    // 病人编辑弹窗
     const baseFormRef = useRef()
-    const [formData, setFormData] = useState({})
+    const [formData, setFormData] = useState()
     const openPatientModal = (row = {}) => {
         baseFormRef.current?.open(row)
     }
-    const submitForm = () => {
-
+    const submitForm = (formValues) => {
+        console.log('表单信息', formValues)
     }
-
+    // 病人详情弹窗
+    const detailRef = useRef()
     return (
         <>
             <SearchRow>
@@ -80,10 +87,16 @@ export default () => {
                 ref={tableRef}
                 columns={columns}
             />
+            {/* 编辑病人信息 */}
             <PatientEditModal
                 ref={baseFormRef}
                 formData={formData}
                 setFormData={setFormData}
+                onSubmit={submitForm}
+            />
+            {/* 病人详情 */}
+            <PatientDetail
+                ref={detailRef}
             />
         </>
     );
