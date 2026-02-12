@@ -63,6 +63,11 @@ export default () => {
         if (value === false || value === 0 || value === '0') return '无';
         return '无';
     };
+    const formatYesNo = (value) => {
+        if (value === true || value === 1 || value === '1') return '是';
+        if (value === false || value === 0 || value === '0') return '否';
+        return '否';
+    };
 
     // 随访记录列表
     const tableRef = useRef();
@@ -231,12 +236,13 @@ export default () => {
                 <Descriptions
                     title="病史信息"
                     bordered
-                    column={3}
+                    column={4}
                     size="small"
                 >
                     <Descriptions.Item label="过敏史">{formatSwitch(data?.allergyHistory)}</Descriptions.Item>
                     <Descriptions.Item label="既往病史">{formatSwitch(data?.medicalHistory)}</Descriptions.Item>
                     <Descriptions.Item label="金属植入史">{formatSwitch(data?.metalImplantHistory)}</Descriptions.Item>
+                    <Descriptions.Item label="是否RCT">{formatYesNo(data?.isRct)}</Descriptions.Item>
                 </Descriptions>
 
                 <Divider />
