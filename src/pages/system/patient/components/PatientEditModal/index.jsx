@@ -151,7 +151,7 @@ export default forwardRef(({
                 formData={formData}
                 setFormData={setFormData}
             />
-            <Row gutter={12}>
+            <Row gutter={12} className={'mt-2'}>
                 <Col span={12}>
                     <Form.Item
                         label={'过敏史'}
@@ -169,12 +169,25 @@ export default forwardRef(({
                     </Form.Item>
                 </Col>
             </Row>
-            <Form.Item
-                label={'金属植入史'}
-                name={'metalImplantHistory'}
-            >
-                <Switch checkedChildren="有" unCheckedChildren="无" />
-            </Form.Item>
+            <Row gutter={12}>
+                <Col span={12}>
+                    <Form.Item
+                        label={'金属植入史'}
+                        name={'metalImplantHistory'}
+                    >
+                        <Switch checkedChildren="有" unCheckedChildren="无" />
+                    </Form.Item>
+                </Col>
+                <Col span={12}>
+                    <Form.Item
+                        label={'是否RCT病人'}
+                        name={'isRct'}
+                    >
+                        <Switch checkedChildren="是" unCheckedChildren="否" />
+                    </Form.Item>
+                </Col>
+            </Row>
+
         </BaseFormModal>
     )
 })
