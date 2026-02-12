@@ -38,5 +38,15 @@ export default Object.freeze({
             label: '女',
             value: '女'
         }
-    ]
+    ],
+    UserTypeOptions:[
+        {
+            label:'管理员',
+            value: 1,
+        },
+        {
+            label: '普通用户',
+            value: 0,
+        }
+    ],
 })

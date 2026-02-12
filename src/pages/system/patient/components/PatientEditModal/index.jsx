@@ -6,6 +6,7 @@ import BaseAntdInput from "@/component/BaseAntdInput/index.jsx";
 import { FAntdInput } from 'izid'
 import Constant from "@/utils/Constant.jsx";
 import BaseAntdSelect from "@/component/BaseAntdSelect/index.jsx";
+import {easyNotNull} from "@/utils/antd-validator.js";
 
 export default forwardRef(({
     formData,
@@ -26,6 +27,7 @@ export default forwardRef(({
                     <Form.Item
                         label={'患者姓名'}
                         name={'name'}
+                        rules={easyNotNull('患者姓名')}
                     >
                         <BaseAntdInput/>
                     </Form.Item>
@@ -34,6 +36,7 @@ export default forwardRef(({
                     <Form.Item
                         label={'性别'}
                         name={'gender'}
+                        rules={easyNotNull('性别')}
                     >
                         <BaseAntdSelect data={Constant.GenderOptions}/>
                     </Form.Item>
@@ -70,6 +73,7 @@ export default forwardRef(({
                     <Form.Item
                         label={'住院号'}
                         name={'inpatientNo'}
+                        rules={easyNotNull('住院号')}
                     >
                         <BaseAntdInput/>
                     </Form.Item>
@@ -80,6 +84,7 @@ export default forwardRef(({
                     <Form.Item
                         label={'出生日期'}
                         name={'birthDate'}
+                        rules={easyNotNull('出生日期')}
                     >
                          <DatePicker
                              placeholder="请选择"
@@ -92,6 +97,7 @@ export default forwardRef(({
                     <Form.Item
                         label={'手术日龄'}
                         name={'surgeryAge'}
+                        rules={easyNotNull('手术日龄')}
                     >
                         <BaseAntdInput/>
                     </Form.Item>
@@ -101,12 +107,14 @@ export default forwardRef(({
             <Form.Item
                 label={'主要诊断'}
                 name={'mainDiagnosis'}
+                rules={easyNotNull('主要诊断')}
             >
                 <Input.TextArea/>
             </Form.Item>
             <Form.Item
                 label={'次要诊断'}
                 name={'secondDiagnosis'}
+                rules={easyNotNull('次要诊断')}
             >
                 <Input.TextArea/>
             </Form.Item>
@@ -115,6 +123,7 @@ export default forwardRef(({
                     <Form.Item
                         label={'联系电话'}
                         name={'phone'}
+                        rules={easyNotNull('联系电话')}
                     >
                         <BaseAntdInput/>
                     </Form.Item>
@@ -123,6 +132,7 @@ export default forwardRef(({
                     <Form.Item
                         label={'基线检查日期'}
                         name={'baseCheckDate'}
+                        rules={easyNotNull('基线检查日期')}
                     >
                          <DatePicker
                              placeholder="请选择"

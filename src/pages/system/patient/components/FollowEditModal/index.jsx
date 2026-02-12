@@ -5,6 +5,7 @@ import {FAntdInput} from "izid/dist/index.modern.mjs";
 import MriEcvCalculate from "@/component/MriEcvCalculate/index.jsx";
 import BaseAntdSelect from "@/component/BaseAntdSelect/index.jsx";
 import Constant from "@/utils/Constant.jsx";
+import {easyNotNull} from "@/utils/antd-validator.js";
 
 export default forwardRef(({
     formData,
@@ -25,6 +26,7 @@ export default forwardRef(({
                     <Form.Item
                         label={'随访类型'}
                         name={'followupType'}
+                        rules={easyNotNull('随访类型')}
                     >
                         <BaseAntdSelect data={Constant.FollowTypeOptions}/>
                     </Form.Item>
@@ -55,6 +57,7 @@ export default forwardRef(({
                     <Form.Item
                         label={'预计随访时间'}
                         name={'expectedFollowupDate'}
+                        rules={easyNotNull('预计随访时间')}
                     >
                         <DatePicker
                             placeholder="请选择"

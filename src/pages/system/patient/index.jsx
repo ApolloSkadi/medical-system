@@ -3,7 +3,7 @@ import BaseAntdTable from "@/component/BaseAntdTable/index.jsx";
 import {useRef, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import CopyText from "@/component/CopyText/index.jsx";
-import {PatientCreate, PatientDel, PatientPage, PatientSaveOrEdit} from "@/api/system/patient/index.js";
+import {PatientDel, PatientPage, PatientSaveOrEdit} from "@/api/system/patient/index.js";
 import PatientEditModal from "@/pages/system/patient/components/PatientEditModal/index.jsx";
 import TableActionButtons from "@/component/TableActionButtons/index.jsx";
 import {Button, message} from "antd";
