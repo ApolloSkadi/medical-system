@@ -7,7 +7,6 @@ export const baseBeforeFilter = req => {
     if (req.url !== '/login') {
         // 使用 zustand 的 getState() 方法在组件外部获取状态
         const authState = useAuthStore.getState()
-        console.log('authState', authState?.token)
         req.headers.token = authState?.token || ''
     }
     if (!req.data) req.data = {};
@@ -49,5 +48,5 @@ export const baseErrorHandle = ({code, message: respMsg, response: resp}) => {
     }
     // 其他错误
     if (apiRespData.code !== 'OK' && apiRespData.code !== 200 && apiRespData.code !== '200') return createErrorReturn(apiRespData.msg)
-
+    return false
 }

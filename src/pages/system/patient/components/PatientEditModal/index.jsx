@@ -3,7 +3,6 @@ import BaseFormModal from "@/component/BaseFormModal/index.jsx";
 import {Form, Input, DatePicker, Switch, Row, Col} from "antd";
 import MriEcvCalculate from "@/component/MriEcvCalculate/index.jsx";
 import BaseAntdInput from "@/component/BaseAntdInput/index.jsx";
-import { FAntdInput } from 'izid'
 import Constant from "@/utils/Constant.jsx";
 import BaseAntdSelect from "@/component/BaseAntdSelect/index.jsx";
 import {easyNotNull} from "@/utils/antd-validator.js";

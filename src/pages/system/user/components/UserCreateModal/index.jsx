@@ -1,15 +1,16 @@
-import {forwardRef} from "react";
+
 import BaseFormModal from "@/component/BaseFormModal/index.jsx";
 import {Form} from "antd";
-import {FAntdInput} from "izid/dist/index.modern.mjs";
+import { FAntdInput } from 'izid'
 import BaseAntdSelect from "@/component/BaseAntdSelect/index.jsx";
 import Constant from "@/utils/Constant.jsx";
 import {easyNotNull} from "@/utils/antd-validator.js";
+import {forwardRef} from "react";
 
 export default forwardRef(({
-    formData,
-    setFormData,
-    onSubmit,
+   formData,
+   setFormData,
+   onSubmit,
 }, ref) => {
     return (
         <BaseFormModal

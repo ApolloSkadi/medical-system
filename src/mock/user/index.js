@@ -180,7 +180,7 @@ export default [
     
     // 获取用户列表（分页）
     {
-        url: '/user/page',
+        url: '/system/user/page',
         method: 'POST',
         timeout: 500,
         response: (req, res) => {
@@ -220,7 +220,7 @@ export default [
     
     // 新增用户
     {
-        url: '/user/add',
+        url: '/system/user/create',
         method: 'POST',
         timeout: 300,
         response: (req, res) => {
@@ -243,7 +243,7 @@ export default [
     
     // 更新用户
     {
-        url: '/user/update',
+        url: '/system/user/editUser',
         method: 'POST',
         timeout: 300,
         response: (req, res) => {

@@ -49,4 +49,16 @@ export default Object.freeze({
             value: 0,
         }
     ],
+    OpenCloseOptions:[
+        {
+            label:'开启',
+            value: 1,
+            color: 'success'
+        },
+        {
+            label: '封禁',
+            value: 0,
+            color: 'error'
+        }
+    ]
 })
