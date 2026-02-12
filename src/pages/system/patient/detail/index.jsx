@@ -15,10 +15,13 @@ import { PatientDetail } from "@/api/system/patient/index.js";
 import { set } from "lodash-es";
 import BaseAntdTable from "@/component/BaseAntdTable/index.jsx";
 import TableActionButtons from "@/component/TableActionButtons/index.jsx";
-import {FollowPage, FollowSaveOrEdit} from "@/api/system/follow/index.js";
+import {FollowDelete, FollowPage, FollowSaveOrEdit} from "@/api/system/follow/index.js";
 import FollowEditModal from "@/pages/system/patient/components/FollowEditModal/index.jsx";
 import dayjs from "dayjs";
 import SearchRow from "@/component/SearchRow/index.jsx";
+import Constant from "@/utils/Constant.jsx";
+import StatusLabel from "@/component/StatusLabel/index.jsx";
+import BasePopconfirm from "@/component/BasePopconfirm/index.jsx";
 
 export default () => {
     const navigate = useNavigate();
@@ -44,7 +47,7 @@ export default () => {
 
     // 返回列表页
     const handleBack = () => {
-        navigate('/patient');
+        navigate(-1);
     };
 
     // 格式化日期显示
@@ -68,7 +71,9 @@ export default () => {
             title: '随访类型',
             dataIndex: 'followupType',
             render(value) {
-
+                const findItem = Constant.FollowTypeOptions.find(v => v.value === value);
+                if (findItem) return <StatusLabel color={findItem.color}>{findItem.label}</StatusLabel>
+                return <StatusLabel/>
             }
         },
         {
@@ -94,6 +99,7 @@ export default () => {
                     <Button type={'link'} onClick={() =>openFollowModal(row)}>
                         编辑
                     </Button>
+                    <BasePopconfirm onConfirm={() => submitDel(row)} />
                 </TableActionButtons>
             }
         }
@@ -112,6 +118,13 @@ export default () => {
         return FollowSaveOrEdit(data).then(res => {
             message.success(res.data);
             baseFormRef.current?.close()
+            tableRef.current?.getTableData();
+        })
+    }
+    // 删除随访
+    const submitDel = data => {
+        return FollowDelete(data).then(res => {
+            message.success(res.data)
             tableRef.current?.getTableData();
         })
     }
@@ -142,7 +155,7 @@ export default () => {
                     onClick={handleBack}
                     className="mb-4"
                 >
-                    返回列表
+                    返回
                 </Button>
             </Flex>
             <Spin spinning={loading}>

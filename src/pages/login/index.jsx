@@ -1,4 +1,4 @@
-import React,{useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Button, Checkbox, Form, Input, message} from 'antd';
 import './index.scss';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
@@ -11,7 +11,7 @@ export default () => {
     const [formData, setFormData] = useState({
         userName: '',
         password: '',
-        autoLogin: false
+        autoLogin: false,
     });
     const [loading, setLoading] =useState(false);
     const navigate = useNavigate();
@@ -32,8 +32,27 @@ export default () => {
         SystemLogin(formData).then(res => {
             message.success('登录成功')
             userLogin({token:res.data.token, userInfo:res.data, role:res.data.role}, navigate)
+            if (formData.autoLogin) {
+                // 记录登录用户名和密码
+                // 后续自动填充
+                localStorage.setItem("userName", formData.userName);
+                localStorage.setItem("password", formData.password);
+                localStorage.setItem("autoLogin", formData.autoLogin);
+            }
         }).finally(cancelLogin)
     }
+    // 自动登录
+    useEffect(() => {
+        if (localStorage.getItem('autoLogin')) {
+            SystemLogin({
+                userName: localStorage.getItem('userName'),
+                password: localStorage.getItem('password'),
+            }).then(res => {
+                message.success('登录成功')
+                userLogin({token:res.data.token, userInfo:res.data, role:res.data.role}, navigate)
+            })
+        }
+    }, []);
 
     return (
         <div className={'login-container'}>

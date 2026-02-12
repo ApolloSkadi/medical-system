@@ -26,10 +26,10 @@ export default ({
                         </div>
                         <div className={'avatar-info'}>
                             <div className={'info-usename'}>
-                                {userInfo.userName}
+                                {userInfo?.userName}
                             </div>
                             <div className={'info-rolename'}>
-                                {userInfo.role === 'admin'? '管理员':'普通用户'}
+                                {userInfo?.role === 'admin'? '管理员':'普通用户'}
                             </div>
                         </div>
                     </div>

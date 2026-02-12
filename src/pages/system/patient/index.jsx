@@ -9,7 +9,7 @@ import TableActionButtons from "@/component/TableActionButtons/index.jsx";
 import {Button, message} from "antd";
 import SearchBtnGroup from "@/component/SearchBtnGroup/index.jsx";
 import { FAntdInput } from 'izid'
-import {EyeOutlined} from "@ant-design/icons";
+import {DeleteOutlined, EyeOutlined} from "@ant-design/icons";
 import dayjs from "dayjs";
 import BasePopconfirm from "@/component/BasePopconfirm/index.jsx";
 
@@ -17,6 +17,8 @@ export default () => {
     const navigate = useNavigate();
     // 接口查询参数
     const [patientName, setPatientName] = useState();
+    const [searchNo, setSearchNo] = useState();
+    const [phone, setPhone] = useState();
     // 病人列表相关
     const tableRef = useRef();
     const columns = [
@@ -67,7 +69,11 @@ export default () => {
                     <Button type={'link'} onClick={() => openPatientModal(row)}>
                         编辑
                     </Button>
-                    <Button type={'link'} icon={<EyeOutlined />} onClick={() => handleViewDetail(row)}>
+                    <Button
+                        type={'link'}
+                        iconPosition="end"
+                        icon={<EyeOutlined style={{marginLeft: '-.5rem'}}/>}
+                        onClick={() => handleViewDetail(row)}>
                         详情
                     </Button>
                     <BasePopconfirm onConfirm={() => submitDel(row)} />
@@ -79,6 +85,8 @@ export default () => {
     const onSearch = () => tableRef.current?.initPageSearch();
     const toReset = () => {
         setPatientName(undefined);
+        setSearchNo(undefined);
+        setPhone(undefined);
         return tableRef.current?.resetPageSearch();
     }
     // 病人编辑弹窗
@@ -105,7 +113,6 @@ export default () => {
             tableRef.current?.getTableData();
         })
     }
-    
     // 跳转到详情页
     const handleViewDetail = (row) => {
         navigate(`/patient/detail/${row.id}`);
@@ -116,6 +123,12 @@ export default () => {
             <SearchRow>
                 <SearchRow.Item title={'患者姓名'}>
                     <FAntdInput state={[patientName, setPatientName]} />
+                </SearchRow.Item>
+                <SearchRow.Item title={'门诊号/住院号'}>
+                    <FAntdInput state={[searchNo, setSearchNo]} />
+                </SearchRow.Item>
+                <SearchRow.Item title={'电话'}>
+                    <FAntdInput state={[phone, setPhone]} />
                 </SearchRow.Item>
                 <SearchRow.Item>
                     <SearchBtnGroup
@@ -129,6 +142,8 @@ export default () => {
                 api={PatientPage}
                 apiData={{
                     name: patientName,
+                    searchNo: searchNo,
+                    phone: phone,
                 }}
                 ref={tableRef}
                 columns={columns}

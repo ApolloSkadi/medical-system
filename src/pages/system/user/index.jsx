@@ -4,15 +4,18 @@ import BaseAntdTable from "@/component/BaseAntdTable/index.jsx";
 import {useRef, useState} from "react";
 import CopyText from "@/component/CopyText/index.jsx";
 import {PatientPage} from "@/api/system/patient/index.js";
+import {UserPage} from "@/api/system/user/index.js";
+import TableActionButtons from "@/component/TableActionButtons/index.jsx";
+import {Button} from "antd";
 
 export default () => {
     // 接口查询参数
-    const [patientName, setPatientName] = useState();
-    // 病人列表相关
+    const [userName, setUserName] = useState();
+    // 用户列表相关
     const tableRef = useRef();
     const columns = [
         {
-            title: '患者姓名',
+            title: '用户名',
             dataIndex: 'name',
             key: 'name',
         },
@@ -22,15 +25,32 @@ export default () => {
             key: 'gender',
         },
         {
-            title:'门诊号',
-            dataIndex: 'phone',
-        },
-        {
-            title: '联系电话',
+            title: '手机号',
             dataIndex: 'phone',
             key: 'phone',
-            render(value) {
-                return <CopyText>{value}</CopyText>;
+        },
+        {
+            title:'用户类型',
+            dataIndex: 'type',
+            key: 'type',
+        },
+        {
+            title:'状态',
+            dataIndex: 'status',
+            key: 'status',
+        },
+        {
+            title: '操作',
+            dataIndex: 'action',
+            key: 'action',
+            render(_,row){
+                return <TableActionButtons>
+                    <Button type={'link'} >修改密码</Button>
+                    { row?.status === 1 ?
+                        <Button type={'link'} >关闭</Button> :
+                        <Button type={'link'} >开启</Button>
+                    }
+                </TableActionButtons>
             }
         },
     ]
@@ -41,15 +61,15 @@ export default () => {
             <SearchRow>
                 <SearchRow.Item title={'用户姓名'}>
                     <BaseAntdInput
-                        value={patientName}
-                        setValue={setPatientName}
+                        value={userName}
+                        setValue={setUserName}
                     />
                 </SearchRow.Item>
             </SearchRow>
             <BaseAntdTable
-                api={PatientPage}
+                api={UserPage}
                 apiData={{
-                    name: patientName,
+                    name: userName,
                 }}
                 ref={tableRef}
                 columns={columns}

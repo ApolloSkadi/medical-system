@@ -42,6 +42,7 @@ export const baseErrorHandle = ({code, message: respMsg, response: resp}) => {
     if (apiRespData.code === 'UNLOGIN') {
         message.config({maxCount: 1});
         message.error('登录过期，请重新登录', 1, () => {
+            localStorage.removeItem("autoLogin")
             window.location.href = '/login';
         })
         return Promise.reject(apiRespData.msg)

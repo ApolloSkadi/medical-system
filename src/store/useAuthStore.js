@@ -34,6 +34,9 @@ const useAuthStore = create(
                 const menuState = useMenuStore.getState()
                 menuState.setMenuList([])
                 navigate('/login')
+                localStorage.removeItem("userName")
+                localStorage.removeItem("password")
+                localStorage.removeItem("autoLogin")
             }
         }),
         {

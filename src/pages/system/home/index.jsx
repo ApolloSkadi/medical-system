@@ -1,12 +1,13 @@
 import React, {useEffect, useState} from 'react';
 import {Calendar, Badge, List, Card, Tag, Modal, Button, Row, Col, Statistic, Dropdown, message} from 'antd';
-import { CalendarOutlined, UserOutlined, TeamOutlined } from '@ant-design/icons';
+import {CalendarOutlined, UserOutlined, TeamOutlined, PhoneOutlined} from '@ant-design/icons';
 import './index.scss'
 import {FollowCalendar, FollowSituation} from "@/api/system/home/index.js";
 import StatusLabel from "@/component/StatusLabel/index.jsx";
 import Constant from "@/utils/Constant.jsx";
 import {useNavigate} from "react-router-dom";
 import {FollowChangeStatus} from "@/api/system/follow/index.js";
+import CopyText from "@/component/CopyText/index.jsx";
 
 export default () => {
     const navigate = useNavigate();
@@ -77,7 +78,7 @@ export default () => {
                         }}
                     >
                         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <span style={{ fontWeight: 'bold' }}>{item.time}</span>
+                            <span style={{ fontWeight: 'bold' }}>{item.outpatientNo}</span>
                             <StatusLabel
                                 type={'badge'}
                                 options={Constant.FollowStatusOptions}
@@ -243,11 +244,15 @@ export default () => {
                             dataSource={getListData(selectedDate)}
                             renderItem={item => (
                                 <List.Item
-                                    actions={[
-                                        <Button type="link" size="small" onClick={()=>patientDetail(item?.patientId)}>查看详情</Button>,
-                                        item?.status === 2 && <Button type="link" size="small" onClick={() => changeStatus(item?.id, 1)}>完成随访</Button>,
-                                        item?.status === 2 && <Button type="link" size="small" onClick={() => changeStatus(item?.id, -1)}>取消随访</Button>
-                                    ]}
+                                    actions={
+                                        item?.status === 0 ? [
+                                            <Button type="link" size="small" onClick={()=>patientDetail(item?.patientId)}>查看</Button>,
+                                            <Button type="link" size="small" onClick={() => changeStatus(item?.id, 1)}>完成</Button>,
+                                            <Button type="link" size="small" onClick={() => changeStatus(item?.id, -1)}>取消</Button>
+                                        ]:[
+                                            <Button type="link" size="small" onClick={()=>patientDetail(item?.patientId)}>查看详情</Button>
+                                        ]
+                                    }
                                 >
                                     <List.Item.Meta
                                         avatar={
@@ -285,10 +290,10 @@ export default () => {
                                         description={
                                             <div>
                                                 <div>
-                                                    <UserOutlined/> 随访医生：{item.doctorName}
+                                                    <UserOutlined/> 门诊号：<CopyText>{item.outpatientNo}</CopyText>
                                                 </div>
                                                 <div>
-                                                    <TeamOutlined/> 时间：{item.time}
+                                                    <PhoneOutlined /> 电话：<CopyText>{item.phone}</CopyText>
                                                 </div>
                                                 <div>患者ID：{item.patientId}</div>
                                             </div>
