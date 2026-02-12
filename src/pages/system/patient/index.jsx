@@ -91,7 +91,7 @@ export default () => {
     }
     // 病人编辑弹窗
     const baseFormRef = useRef()
-    const [formData, setFormData] = useState()
+    const [formData, setFormData] = useState({})
     const openPatientModal = (row = {}) => {
         baseFormRef.current?.open({
             ...row,
@@ -99,8 +99,33 @@ export default () => {
             baseCheckDate: row?.baseCheckDate ? dayjs(row?.baseCheckDate) : undefined,
         })
     }
-    const submitForm = (formValues) => {
-        return PatientSaveOrEdit(formValues).then(res => {
+    const submitForm = (data) => {
+        return PatientSaveOrEdit({
+            id: data.id,
+            name: data.name,
+            gender: data.gender,
+            birthWeight: data.birthWeight,
+            gestationalAge: data.gestationalAge,
+            outpatientNo: data.outpatientNo,
+            inpatientNo: data.inpatientNo,
+            birthDate: dayjs(data.birthDate,'yyyy-MM-dd'),
+            surgeryAge: data.surgeryAge,
+            mainDiagnosis: data.mainDiagnosis,
+            secondDiagnosis: data.secondDiagnosis,
+            phone: data.phone,
+            baseCheckDate: dayjs(data.baseCheckDate,'yyyy-MM-dd'),
+            baseCheckResult: data.baseCheckResult,
+            checkMriRightPost: data.checkMriRightPost,
+            checkMriRightNative: data.checkMriRightNative,
+            checkMriBloodPost: data.checkMriBloodPost,
+            checkMriBloodNative: data.checkMriBloodNative,
+            checkMriHct: data.checkMriHct,
+            checkMriEcv: data.checkMriEcv,
+            allergyHistory: data.allergyHistory ?? false,
+            medicalHistory: data.medicalHistory ?? false,
+            metalImplantHistory: data.metalImplantHistory ?? false,
+            isRct: data.isRct ?? false,
+        }).then(res => {
             message.success(res.data)
             baseFormRef.current?.close()
             tableRef.current?.getTableData();
@@ -151,8 +176,8 @@ export default () => {
             {/* 编辑病人信息 */}
             <PatientEditModal
                 ref={baseFormRef}
-                formData={formData}
-                setFormData={setFormData}
+                data={formData}
+                setData={setFormData}
                 onSubmit={submitForm}
             />
         </>
