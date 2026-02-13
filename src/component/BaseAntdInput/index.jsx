@@ -27,6 +27,7 @@ export default forwardRef(({
     autoSearch = true,
     strict,
     price,
+    float,
     percentage,
     ...args
 }, ref) => {
@@ -68,6 +69,17 @@ export default forwardRef(({
                     step: 1,
                     precision: 0,
                     min: 1,
+                }
+                : {})}
+            {...(float
+                ? {
+                    step: 0.01,
+                    parser (value) {
+                        // 最多支持小数点后两位
+                        const decimalTarget = value
+                        if (decimalTarget === '' || decimalTarget === undefined || decimalTarget === 'undefined') return undefined
+                        return +new Decimal(decimalTarget).toFixed(2)
+                    }
                 }
                 : {})}
             {...(price
@@ -142,7 +154,7 @@ export default forwardRef(({
             style={{ minWidth: '15rem', ...inputStyles }}
         />
     )
-    if (type === 'number' || price || strict || percentage) return NumberInput
+    if (type === 'number' || price || strict || percentage || float) return NumberInput
     if (type === 'password') return PasswordInput
     if (type === 'search') return SearchInput
     return BaseInput

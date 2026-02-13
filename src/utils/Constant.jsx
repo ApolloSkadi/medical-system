@@ -2,14 +2,26 @@
 export default Object.freeze({
     FollowTypeOptions:[
         {
-            label: '常规随访',
+            label: '访视一',
             value: 1,
             color: 'primary'
         },
         {
-            label: '术后复查',
+            label: '访视二',
             value: 2,
             color: 'purple'
+        }
+        ,
+        {
+            label: '访视三',
+            value: 3,
+            color: 'orange'
+        }
+        ,
+        {
+            label: '其他',
+            value: 4,
+            color: 'red'
         }
     ],
     FollowStatusOptions:[

@@ -211,8 +211,10 @@ export default () => {
                     extra={
                         <div style={{display: 'flex', gap: 16, alignItems: 'center'}}>
                             <div>
-                                <Badge color="blue" text="常规随访"/>
-                                <Badge color="purple" text="术后复查" style={{marginLeft: 8}}/>
+                                <Badge color="blue" text="访视一"/>
+                                <Badge color="purple" text="访视二" style={{marginLeft: 8}}/>
+                                <Badge color="orange" text="访视三" style={{marginLeft: 8}}/>
+                                <Badge color="red" text="其他" style={{marginLeft: 8}}/>
                             </div>
                             <div>
                                 <Badge status="success" text="已完成"/>

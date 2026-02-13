@@ -41,8 +41,8 @@ export default ({ formData, setFormData }) => {
             
             // 计算 ECV 值 保留两位小数
             const ecv = (1 - checkMriHct / 100) * 
-                (1 / checkMriRightPost - 1 / checkMriBloodPost) / 
-                (1 / checkMriRightNative - 1 / checkMriBloodNative);
+                (1 / checkMriRightPost - 1 / checkMriRightNative) /
+                (1 / checkMriBloodPost - 1 / checkMriBloodNative) * 100;
             
             // 更新表单中的 ECV 字段
             form.setFieldValue('checkMriEcv',ecv ? ecv.toFixed(2) : undefined);
@@ -62,12 +62,12 @@ export default ({ formData, setFormData }) => {
             <Row gutter={24}>
                 <Col span={12}>
                     <Form.Item label="右心室T1 post" name={"checkMriRightPost"}>
-                        <BaseAntdInput strict/>
+                        <BaseAntdInput float/>
                     </Form.Item>
                 </Col>
                 <Col span={12}>
                     <Form.Item label="右心室T1 native" name={"checkMriRightNative"}>
-                        <BaseAntdInput strict/>
+                        <BaseAntdInput float/>
                     </Form.Item>
                 </Col>
             </Row>
@@ -75,12 +75,12 @@ export default ({ formData, setFormData }) => {
             <Row gutter={24}>
                 <Col span={12}>
                     <Form.Item label="血池T1 post" name={"checkMriBloodPost"}>
-                        <BaseAntdInput strict/>
+                        <BaseAntdInput float/>
                     </Form.Item>
                 </Col>
                 <Col span={12}>
                     <Form.Item label="血池T1 native" name={"checkMriBloodNative"}>
-                        <BaseAntdInput strict/>
+                        <BaseAntdInput float/>
                     </Form.Item>
                 </Col>
             </Row>
@@ -88,7 +88,7 @@ export default ({ formData, setFormData }) => {
             <Row gutter={24}>
                 <Col span={12}>
                     <Form.Item label="HCT" name={"checkMriHct"}>
-                        <BaseAntdInput strict/>
+                        <BaseAntdInput float/>
                     </Form.Item>
                 </Col>
                 <Col span={12}>
