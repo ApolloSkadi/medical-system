@@ -33,7 +33,7 @@ export default forwardRef(({
                 </Col>
                 <Col span={12}>
                     <Form.Item
-                        label={'随访体重'}
+                        label={'随访体重(kg)'}
                         name={'followupWeight'}
                     >
                         <FAntdInput  suffix="kg" />
