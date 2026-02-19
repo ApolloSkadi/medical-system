@@ -47,7 +47,7 @@ export default forwardRef(({
                         label={'出生体重(kg)'}
                         name={'birthWeight'}
                     >
-                        <BaseAntdInput/>
+                        <BaseAntdInput  suffix="kg" />
                     </Form.Item>
                 </Col>
                 <Col span={12}>

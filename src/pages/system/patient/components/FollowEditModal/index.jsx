@@ -36,22 +36,22 @@ export default forwardRef(({
                         label={'随访体重'}
                         name={'followupWeight'}
                     >
-                        <FAntdInput />
+                        <FAntdInput  suffix="kg" />
                     </Form.Item>
                 </Col>
             </Row>
-            <Form.Item
-                label={'主要诊断'}
-                name={'mainDiagnosis'}
-            >
-                <Input.TextArea/>
-            </Form.Item>
-            <Form.Item
-                label={'次要诊断'}
-                name={'secondDiagnosis'}
-            >
-                <Input.TextArea/>
-            </Form.Item>
+            {/*<Form.Item*/}
+            {/*    label={'主要诊断'}*/}
+            {/*    name={'mainDiagnosis'}*/}
+            {/*>*/}
+            {/*    <Input.TextArea/>*/}
+            {/*</Form.Item>*/}
+            {/*<Form.Item*/}
+            {/*    label={'次要诊断'}*/}
+            {/*    name={'secondDiagnosis'}*/}
+            {/*>*/}
+            {/*    <Input.TextArea/>*/}
+            {/*</Form.Item>*/}
             <Row gutter={12}>
                 <Col span={12}>
                     <Form.Item
