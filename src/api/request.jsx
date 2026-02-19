@@ -36,6 +36,7 @@ export const baseErrorHandle = ({code, message: respMsg, response: resp}) => {
     if (code === 'ECONNABORTED' || respMsg === 'Network Error' || respMsg?.includes('timeout')) return createErrorReturn('网络请求超时');
     // 处理正确响应内容
     console.log('resp', resp)
+    if (!resp.data.code) return resp
     const apiRespData = resp.data;
     // token 过期处理
     if (apiRespData.code === 'UNLOGIN') {

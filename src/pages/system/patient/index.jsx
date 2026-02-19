@@ -3,17 +3,20 @@ import BaseAntdTable from "@/component/BaseAntdTable/index.jsx";
 import {useRef, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import CopyText from "@/component/CopyText/index.jsx";
-import {PatientDel, PatientPage, PatientSaveOrEdit} from "@/api/system/patient/index.js";
+import {ExportPatient, ImportPatient, PatientDel, PatientPage, PatientSaveOrEdit} from "@/api/system/patient/index.js";
 import PatientEditModal from "@/pages/system/patient/components/PatientEditModal/index.jsx";
 import TableActionButtons from "@/component/TableActionButtons/index.jsx";
 import {Button, message} from "antd";
 import SearchBtnGroup from "@/component/SearchBtnGroup/index.jsx";
 import { FAntdInput } from 'izid'
-import {DeleteOutlined, EyeOutlined} from "@ant-design/icons";
+import {DeleteOutlined, DownloadOutlined, EyeOutlined, VerticalAlignTopOutlined} from "@ant-design/icons";
 import dayjs from "dayjs";
 import BasePopconfirm from "@/component/BasePopconfirm/index.jsx";
 import BaseAntdSelect from "@/component/BaseAntdSelect/index.jsx";
 import Constant from "@/utils/Constant.jsx";
+import PatientUpload from "@/pages/system/patient/components/PatientUpload/index.jsx";
+import download from 'downloadjs'
+import {isNotNullArray} from "@/utils/handler.jsx";
 
 export default () => {
     const navigate = useNavigate();
@@ -146,7 +149,38 @@ export default () => {
     const handleViewDetail = (row) => {
         navigate(`/patient/detail/${row.id}`);
     }
-    
+    // 病人上传
+    const [uploadForm, setUploadForm] = useState({})
+    const uploadRef = useRef()
+    const uploadSubmit = () => {
+        const  data = new FormData()
+        if (isNotNullArray(uploadForm?.fileList)) {
+            data.append('file', uploadForm.fileList[0].originFileObj)
+        }
+        return ImportPatient(data).then(res => {
+            message.success(res.data);
+        })
+    }
+    // 导出文件
+    const [exportLoading, setExportLoading] = useState(false);
+    const exportSubmit = () => {
+        return ExportPatient({
+            name: patientName,
+            searchNo: searchNo,
+            phone: phone,
+            isRct: isRct,
+        }).then(res => {
+            const blob = new Blob([res.data])
+            const url = window.URL.createObjectURL(blob)
+
+            const link = document.createElement('a')
+            link.href = url
+            link.download = "病人列表.xlsx"
+            link.click()
+
+            window.URL.revokeObjectURL(url)
+        })
+    }
     return (
         <>
             <SearchRow>
@@ -175,6 +209,22 @@ export default () => {
                     />
                 </SearchRow.Item>
             </SearchRow>
+            <SearchRow>
+                <SearchRow.Item>
+                    <Button icon={<VerticalAlignTopOutlined />} type={'primary'} onClick={() => uploadRef.current?.open({})}>
+                        上传文件
+                    </Button>
+                </SearchRow.Item>
+                <SearchRow.Item>
+                    <Button loading={exportLoading} icon={<DownloadOutlined />} type={'primary'}
+                            onClick={() => {
+                                setExportLoading(true)
+                                exportSubmit().finally(() => setExportLoading(false))
+                            }}>
+                        导出文件
+                    </Button>
+                </SearchRow.Item>
+            </SearchRow>
             <BaseAntdTable
                 api={PatientPage}
                 apiData={{
@@ -192,6 +242,13 @@ export default () => {
                 data={formData}
                 setData={setFormData}
                 onSubmit={submitForm}
+            />
+            {/* 上传文件 */}
+            <PatientUpload
+                ref={uploadRef}
+                formData={uploadForm}
+                setFormData={setUploadForm}
+                onSubmit={uploadSubmit}
             />
         </>
     );

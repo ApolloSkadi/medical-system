@@ -61,7 +61,7 @@ export default () => {
                 {/* 登录背景图片 */}
                 <div className={'login-st'}>
                     <div className={'welcome-text'}>
-                        WELCOME TO PSSYSTEM
+                        SPIRR-PS-PA 临床试验
                     </div>
                 </div>
                 {/* 登录表单 */}
