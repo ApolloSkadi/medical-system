@@ -93,7 +93,7 @@ export default ({ formData, setFormData }) => {
                 </Col>
                 <Col span={12}>
                     <Form.Item label="ECV" name={"checkMriEcv"}>
-                        <BaseAntdInput disabled />
+                        <BaseAntdInput float />
                     </Form.Item>
                 </Col>
             </Row>
