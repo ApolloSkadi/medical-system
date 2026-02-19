@@ -72,5 +72,15 @@ export default Object.freeze({
             value: 0,
             color: 'error'
         }
+    ],
+    RCTFlagOptions:[
+        {
+            label: '是',
+            value: 1
+        },
+        {
+            label: '否',
+            value: 0,
+        }
     ]
 })

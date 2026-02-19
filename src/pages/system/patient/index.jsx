@@ -12,6 +12,8 @@ import { FAntdInput } from 'izid'
 import {DeleteOutlined, EyeOutlined} from "@ant-design/icons";
 import dayjs from "dayjs";
 import BasePopconfirm from "@/component/BasePopconfirm/index.jsx";
+import BaseAntdSelect from "@/component/BaseAntdSelect/index.jsx";
+import Constant from "@/utils/Constant.jsx";
 
 export default () => {
     const navigate = useNavigate();
@@ -19,6 +21,7 @@ export default () => {
     const [patientName, setPatientName] = useState();
     const [searchNo, setSearchNo] = useState();
     const [phone, setPhone] = useState();
+    const [isRct, setIsRct] = useState();
     // 病人列表相关
     const tableRef = useRef();
     const columns = [
@@ -71,8 +74,8 @@ export default () => {
                     </Button>
                     <Button
                         type={'link'}
-                        iconPosition="end"
-                        icon={<EyeOutlined style={{marginLeft: '-.5rem'}}/>}
+                        // iconPlacement="end"
+                        icon={<EyeOutlined/>}
                         onClick={() => handleViewDetail(row)}>
                         详情
                     </Button>
@@ -87,6 +90,7 @@ export default () => {
         setPatientName(undefined);
         setSearchNo(undefined);
         setPhone(undefined);
+        setIsRct(undefined);
         return tableRef.current?.resetPageSearch();
     }
     // 病人编辑弹窗
@@ -155,6 +159,14 @@ export default () => {
                 <SearchRow.Item title={'电话'}>
                     <FAntdInput state={[phone, setPhone]} />
                 </SearchRow.Item>
+                <SearchRow.Item title={'RCT'}>
+                    <BaseAntdSelect
+                        value={isRct}
+                        style={{width: '15rem'}}
+                        setValue={setIsRct}
+                        data={Constant.RCTFlagOptions}
+                    />
+                </SearchRow.Item>
                 <SearchRow.Item>
                     <SearchBtnGroup
                         onSearch={onSearch}
@@ -169,6 +181,7 @@ export default () => {
                     name: patientName,
                     searchNo: searchNo,
                     phone: phone,
+                    isRct: isRct,
                 }}
                 ref={tableRef}
                 columns={columns}
