@@ -22,13 +22,21 @@ export default forwardRef(({
             onSubmit={onSubmit}
         >
             <Row gutter={12}>
-                <Col span={12}>
+                <Col span={24}>
                     <Form.Item
                         label={'随访类型'}
                         name={'followupType'}
                         rules={easyNotNull('随访类型')}
                     >
                         <BaseAntdSelect data={Constant.FollowTypeOptions}/>
+                    </Form.Item>
+                </Col>
+                <Col span={12}>
+                    <Form.Item
+                        label={'随访身高(cm)'}
+                        name={'followupHeight'}
+                    >
+                        <FAntdInput  suffix="cm" />
                     </Form.Item>
                 </Col>
                 <Col span={12}>
@@ -40,18 +48,6 @@ export default forwardRef(({
                     </Form.Item>
                 </Col>
             </Row>
-            {/*<Form.Item*/}
-            {/*    label={'主要诊断'}*/}
-            {/*    name={'mainDiagnosis'}*/}
-            {/*>*/}
-            {/*    <Input.TextArea/>*/}
-            {/*</Form.Item>*/}
-            {/*<Form.Item*/}
-            {/*    label={'次要诊断'}*/}
-            {/*    name={'secondDiagnosis'}*/}
-            {/*>*/}
-            {/*    <Input.TextArea/>*/}
-            {/*</Form.Item>*/}
             <Row gutter={12}>
                 <Col span={12}>
                     <Form.Item
