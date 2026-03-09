@@ -1,9 +1,9 @@
-import { HomeOutlined, TeamOutlined,MedicineBoxOutlined} from '@ant-design/icons';
 import Main from "@/pages/system";
 import Home from '@/pages/system/home';
 import Patient from '@/pages/system/patient';
 import PatientDetail from '@/pages/system/patient/detail';
 import User from '@/pages/system/user';
+import Subscribe from '@/pages/system/subscribe';
 export default [{
     path: '/',
     element: <Main/>,
@@ -45,6 +45,15 @@ export default [{
             meta: {
                 title: '用户管理',
                 icon: 'TeamOutlined',
+                roles: ['admin']
+            }
+        },
+        {
+            path: 'subscribe',
+            element: <Subscribe/>,
+            meta: {
+                title: '提醒管理',
+                icon: 'BellOutlined',
                 roles: ['admin']
             }
         }

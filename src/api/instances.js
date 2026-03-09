@@ -28,3 +28,5 @@ export const UserInstance = createAxiosInstance({baseURL: '/system/user'})
 export const PatientInstance = createAxiosInstance({baseURL: '/system/patient'})
 // 随访接口
 export const FollowInstance = createAxiosInstance({baseURL: '/system/follow'})
+// 消息通知接口
+export const SubscribeInstance = createAxiosInstance({baseURL: '/system/subscribe'})

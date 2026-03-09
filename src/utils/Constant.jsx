@@ -73,6 +73,18 @@ export default Object.freeze({
             color: 'error'
         }
     ],
+    StartCloseOptions:[
+        {
+            label:'开启',
+            value: 1,
+            color: 'success'
+        },
+        {
+            label: '关闭',
+            value: 0,
+            color: 'error'
+        }
+    ],
     RCTFlagOptions:[
         {
             label: '是',

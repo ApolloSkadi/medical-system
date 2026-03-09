@@ -3,11 +3,12 @@ import {useMenuStore} from "@/store/menu.js";
 import {useNavigate} from "react-router-dom";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {isNotNullArray, isNotNullObject} from "@/utils/handler.jsx";
-import { HomeOutlined, TeamOutlined, MedicineBoxOutlined} from '@ant-design/icons';
+import {HomeOutlined, TeamOutlined, MedicineBoxOutlined, BellOutlined} from '@ant-design/icons';
 const iconMap = {
     HomeOutlined: <HomeOutlined />,
     TeamOutlined: <TeamOutlined />,
     MedicineBoxOutlined: <MedicineBoxOutlined />,
+    BellOutlined: <BellOutlined/>,
 }
 
 export default () => {
