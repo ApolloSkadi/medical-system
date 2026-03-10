@@ -1,7 +1,13 @@
 import SearchRow from "@/component/SearchRow/index.jsx";
 import SearchBtnGroup from "@/component/SearchBtnGroup/index.jsx";
 import BaseAntdTable from "@/component/BaseAntdTable/index.jsx";
-import {SubscribeDel, SubscribePage, SubscribeSaveOrEdit, SubscribeTest} from "@/api/system/subscribe/index.js";
+import {
+    JobTrigger,
+    SubscribeDel,
+    SubscribePage,
+    SubscribeSaveOrEdit,
+    SubscribeTest
+} from "@/api/system/subscribe/index.js";
 import {useRef, useState} from "react";
 import Constant from "@/utils/Constant.jsx";
 import StatusLabel from "@/component/StatusLabel/index.jsx";
@@ -104,6 +110,16 @@ export default () => {
             tableRef.current?.getTableData()
         })
     }
+    const [jobTriggerLoading, setJobTriggerLoading] = useState(false)
+    const subJobTrigger = () => {
+        setJobTriggerLoading(true)
+        return JobTrigger().then(res => {
+            message.success(res.data)
+
+        }).finally(()=> {
+            setJobTriggerLoading(false)
+        })
+    }
 
     return (
         <>
@@ -122,6 +138,11 @@ export default () => {
                         onReset={onReset}
                         onAdd={openModal}
                     />
+                </SearchRow.Item>
+            </SearchRow>
+            <SearchRow>
+                <SearchRow.Item>
+                    <Button type={'primary'} onClick={subJobTrigger} loading={jobTriggerLoading}>提醒任务触发</Button>
                 </SearchRow.Item>
             </SearchRow>
             <BaseAntdTable

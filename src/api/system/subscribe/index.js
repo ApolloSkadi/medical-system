@@ -7,3 +7,5 @@ export const SubscribeSaveOrEdit = data => SubscribeInstance.post('/saveOrEdit',
 export const SubscribeTest = data => SubscribeInstance.post('/test', data);
 
 export const SubscribeDel = data => SubscribeInstance.post('/delete', data);
+
+export const JobTrigger = data => SubscribeInstance.post('/jobTrigger', data);
