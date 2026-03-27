@@ -115,8 +115,8 @@ export default () => {
     const openFollowModal = (row= {}) => {
         baseFormRef.current?.open({
             ...row,
-            actualFollowupDate: row?.actualFollowupDate ? dayjs(row?.actualFollowupDate) : undefined,
-            expectedFollowupDate: row?.expectedFollowupDate ? dayjs(row.expectedFollowupDate) : undefined,
+            actualFollowupDate: row?.actualFollowupDate ? dayjs(row?.actualFollowupDate).tz('Asia/Shanghai') : undefined,
+            expectedFollowupDate: row?.expectedFollowupDate ? dayjs(row.expectedFollowupDate).tz('Asia/Shanghai') : undefined,
         })
     }
     const submitForm = (data) => {
