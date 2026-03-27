@@ -115,14 +115,14 @@ export default () => {
     const openFollowModal = (row= {}) => {
         baseFormRef.current?.open({
             ...row,
-            actualFollowupDate: row?.actualFollowupDate ? dayjs(row?.actualFollowupDate).tz('Asia/Shanghai') : undefined,
-            expectedFollowupDate: row?.expectedFollowupDate ? dayjs(row.expectedFollowupDate).tz('Asia/Shanghai') : undefined,
+            actualFollowupDate: row?.actualFollowupDate ? dayjs(row?.actualFollowupDate) : undefined,
+            expectedFollowupDate: row?.expectedFollowupDate ? dayjs(row.expectedFollowupDate) : undefined,
         })
     }
     const submitForm = (data) => {
         const submitData = cloneDeep(data);
-        submitData.expectedFollowupDate = data.expectedFollowupDate ? dayjs(submitData.expectedFollowupDate) : undefined;
-        submitData.actualFollowupDate = data.actualFollowupDate ? dayjs(submitData.actualFollowupDate) : undefined;
+        submitData.expectedFollowupDate = data.expectedFollowupDate ? dayjs(submitData.expectedFollowupDate).format('YYYY-MM-DD') : undefined;
+        submitData.actualFollowupDate = data.actualFollowupDate ? dayjs(submitData.actualFollowupDate).format('YYYY-MM-DD') : undefined;
         return FollowSaveOrEdit(submitData).then(res => {
             message.success(res.data);
             baseFormRef.current?.close()

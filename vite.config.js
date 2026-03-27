@@ -37,7 +37,8 @@ export default defineConfig({
         // 如需连接真实后端，取消下方注释
         proxy: {
             '/system':{
-                target: 'http://localhost:8077',
+                // target: 'http://localhost:8077',
+                target: 'https://api.followupsystem.online',
                 changeOrigin: true,
             }
         },
