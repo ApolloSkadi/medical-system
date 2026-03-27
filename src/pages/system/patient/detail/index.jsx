@@ -12,7 +12,7 @@ import {
 } from "@ant-design/icons";
 import { PatientPage } from "@/api/system/patient/index.js";
 import { PatientDetail } from "@/api/system/patient/index.js";
-import { set } from "lodash-es";
+import {cloneDeep, set} from "lodash-es";
 import BaseAntdTable from "@/component/BaseAntdTable/index.jsx";
 import TableActionButtons from "@/component/TableActionButtons/index.jsx";
 import {FollowDelete, FollowPage, FollowSaveOrEdit} from "@/api/system/follow/index.js";
@@ -120,7 +120,10 @@ export default () => {
         })
     }
     const submitForm = (data) => {
-        return FollowSaveOrEdit(data).then(res => {
+        const submitData = cloneDeep(data);
+        submitData.expectedFollowupDate = data.expectedFollowupDate ? dayjs(submitData.expectedFollowupDate) : undefined;
+        submitData.actualFollowupDate = data.actualFollowupDate ? dayjs(submitData.actualFollowupDate) : undefined;
+        return FollowSaveOrEdit(submitData).then(res => {
             message.success(res.data);
             baseFormRef.current?.close()
             tableRef.current?.getTableData();
