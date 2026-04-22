@@ -94,5 +94,15 @@ export default Object.freeze({
             label: '否',
             value: 0,
         }
+    ],
+    ProductModeOptions:[
+        {
+            label: '顺产', 
+            value: 1
+        },
+        {
+            label: '剖腹产', 
+            value: 2
+        },
     ]
 })

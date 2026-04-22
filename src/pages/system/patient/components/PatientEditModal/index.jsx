@@ -6,6 +6,7 @@ import BaseAntdInput from "@/component/BaseAntdInput/index.jsx";
 import Constant from "@/utils/Constant.jsx";
 import BaseAntdSelect from "@/component/BaseAntdSelect/index.jsx";
 import {easyNotNull} from "@/utils/antd-validator.js";
+import EchoCard from "@/component/EchoCard/index.jsx";
 
 export default forwardRef(({
     formData,
@@ -102,7 +103,26 @@ export default forwardRef(({
                     </Form.Item>
                 </Col>
             </Row>
-
+            <Row gutter={12} className={'mt-2'}>
+                <Col span={12}>
+                    <Form.Item
+                        label={'孕产次'}
+                        name={'gravidityTime'}
+                    >
+                        <BaseAntdInput strict/>
+                    </Form.Item>
+                </Col>
+                <Col span={12}>
+                    <Form.Item
+                        label={'生产方式'}
+                        name={'productMode'}
+                    >
+                        <BaseAntdSelect
+                            data={Constant.ProductModeOptions}
+                        />
+                    </Form.Item>
+                </Col>
+            </Row>
             <Form.Item
                 label={'主要诊断'}
                 name={'mainDiagnosis'}
@@ -147,23 +167,29 @@ export default forwardRef(({
             >
                 <Input.TextArea/>
             </Form.Item>
+            <EchoCard
+                prefix="base"
+                setFormData={setFormData}
+            />
             <MriEcvCalculate
                 formData={formData}
                 setFormData={setFormData}
             />
-            <Row gutter={12} className={'mt-2'}>
+            <Row gutter={12}>
                 <Col span={12}>
                     <Form.Item
                         label={'过敏史'}
                         name={'allergyHistory'}
+                        valuePropName="checked"
                     >
                         <Switch checkedChildren="有" unCheckedChildren="无" />
                     </Form.Item>
-                        </Col>
+                </Col>
                 <Col span={12}>
                     <Form.Item
-                        label={'既往病史'}
-                        name={'medicalHistory'}
+                        label={'金属植入史'}
+                        name={'metalImplantHistory'}
+                        valuePropName="checked"
                     >
                         <Switch checkedChildren="有" unCheckedChildren="无" />
                     </Form.Item>
@@ -172,8 +198,9 @@ export default forwardRef(({
             <Row gutter={12}>
                 <Col span={12}>
                     <Form.Item
-                        label={'金属植入史'}
-                        name={'metalImplantHistory'}
+                        label={'家族史'}
+                        name={'familyHistory'}
+                        valuePropName="checked"
                     >
                         <Switch checkedChildren="有" unCheckedChildren="无" />
                     </Form.Item>
@@ -182,11 +209,33 @@ export default forwardRef(({
                     <Form.Item
                         label={'是否RCT病人'}
                         name={'isRct'}
+                        valuePropName="checked"
                     >
                         <Switch checkedChildren="是" unCheckedChildren="否" />
                     </Form.Item>
                 </Col>
             </Row>
+            <Row gutter={12}>
+                <Col span={12}>
+                    <Form.Item
+                        label={'用药/干预措施'}
+                        name={'medication'}
+                        valuePropName="checked"
+                    >
+                        <Switch checkedChildren="有" unCheckedChildren="无" />
+                    </Form.Item>
+                </Col>
+            </Row>
+            <Form.Item noStyle shouldUpdate={(prev, cur) => prev.medication !== cur.medication}>
+                {({getFieldValue}) => getFieldValue('medication') ? (
+                    <Form.Item
+                        label={'用药/干预措施详情'}
+                        name={'medicationDetail'}
+                    >
+                        <Input.TextArea/>
+                    </Form.Item>
+                ) : null}
+            </Form.Item>
 
         </BaseFormModal>
     )

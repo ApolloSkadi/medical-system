@@ -42,6 +42,12 @@ export default forwardRef(({
         if (value === false || value === 0 || value === '0') return '无';
         return '-';
     };
+    const formatProductMode = (value) => {
+        if (value === 1 || value === '1') return '顺产';
+        if (value === 2 || value === '2') return '剖腹产';
+        return '-';
+    };
+    const formatValue = value => (value === undefined || value === null || value === '') ? '-' : value;
 
     return (
         <DraggableModal
@@ -120,8 +126,12 @@ export default forwardRef(({
                 size="small"
             >
                 <Descriptions.Item label="过敏史">{formatSwitch(data?.allergyHistory)}</Descriptions.Item>
-                <Descriptions.Item label="既往病史">{formatSwitch(data?.medicalHistory)}</Descriptions.Item>
                 <Descriptions.Item label="金属植入史">{formatSwitch(data?.metalImplantHistory)}</Descriptions.Item>
+                <Descriptions.Item label="孕产次">{formatValue(data?.gravidityTime)}</Descriptions.Item>
+                <Descriptions.Item label="生产方式">{formatProductMode(data?.productMode)}</Descriptions.Item>
+                <Descriptions.Item label="家族史">{formatSwitch(data?.familyHistory)}</Descriptions.Item>
+                <Descriptions.Item label="用药/干预措施">{formatSwitch(data?.medication)}</Descriptions.Item>
+                <Descriptions.Item label="用药/干预措施详情" span={3}>{formatValue(data?.medicationDetail)}</Descriptions.Item>
             </Descriptions>
         </DraggableModal>
     )

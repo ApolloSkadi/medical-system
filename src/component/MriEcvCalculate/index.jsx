@@ -1,8 +1,18 @@
 import {Card, Col, Form, Row} from "antd";
 import BaseAntdInput from "@/component/BaseAntdInput/index.jsx";
 import { useEffect, useRef } from "react";
+import AutoCalculateInput from "@/component/AutoCalculateInput/index.jsx";
 
-export default ({ formData, setFormData }) => {
+const rvefCalculate = ([rvedv, rvesv]) => {
+    if (rvedv.isZero()) return undefined;
+    return rvedv.minus(rvesv).div(rvedv).mul(100);
+}
+
+export default ({ 
+    formData, 
+    setFormData,
+    isRv = true, 
+}) => {
     const form = Form.useFormInstance();
     
     // 使用 useWatch 监听五个输入字段的变化
@@ -97,6 +107,31 @@ export default ({ formData, setFormData }) => {
                     </Form.Item>
                 </Col>
             </Row>
+            { isRv && (
+                <Row gutter={24}>
+                    <Col span={8}>
+                        <Form.Item label="RVEDV(ml)" name={"checkMriRvedv"}>
+                            <BaseAntdInput float/>
+                        </Form.Item>
+                    </Col>
+                    <Col span={8}>
+                        <Form.Item label="RVESV(ml)" name={"checkMriRvesv"}>
+                            <BaseAntdInput float/>
+                        </Form.Item>
+                    </Col>
+                    <Col span={8}>
+                        <Form.Item label="RVEF(%)" name={"checkMriRvef"}>
+                            <AutoCalculateInput
+                                name="checkMriRvef"
+                                watchNames={["checkMriRvedv", "checkMriRvesv"]}
+                                calculate={rvefCalculate}
+                                setFormData={setFormData}
+                                inputProps={{suffix: '%'}}
+                            />
+                        </Form.Item>
+                    </Col>
+                </Row>
+            )}
         </Card>
     );
 };

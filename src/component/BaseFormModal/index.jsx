@@ -48,7 +48,7 @@ export default forwardRef(
         const open = (formData) => {
             initChangeForm(formData);
             const _data = cloneDeep(formData);
-            if (data && setData) setData(_data);
+            if (setData) setData(_data);
             setVisible(true);
         };
         // 监听表单数据改变
@@ -79,7 +79,7 @@ export default forwardRef(
         );
         // 表单字段变化
         const onValuesChange = (_, newFormData) => {
-            if (setData && data) {
+            if (setData) {
                 setData(Object.assign({}, data, newFormData));
             }
         };

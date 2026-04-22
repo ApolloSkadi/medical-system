@@ -107,7 +107,7 @@ export default () => {
         })
     }
     const submitForm = (data) => {
-        return PatientSaveOrEdit({
+        const submitData = {
             id: data.id,
             name: data.name,
             gender: data.gender,
@@ -115,24 +115,46 @@ export default () => {
             gestationalAge: data.gestationalAge,
             outpatientNo: data.outpatientNo,
             inpatientNo: data.inpatientNo,
-            birthDate: dayjs(data.birthDate).format('YYYY-MM-DD'),
+            birthDate: data.birthDate ? dayjs(data.birthDate).format('YYYY-MM-DD') : undefined,
             surgeryAge: data.surgeryAge,
+            phone: data.phone,
             mainDiagnosis: data.mainDiagnosis,
             secondDiagnosis: data.secondDiagnosis,
-            phone: data.phone,
-            baseCheckDate: dayjs(data.baseCheckDate).format('YYYY-MM-DD'),
+            baseCheckDate: data.baseCheckDate ? dayjs(data.baseCheckDate).format('YYYY-MM-DD') : undefined,
             baseCheckResult: data.baseCheckResult,
+            baseEchoRvEda: data.baseEchoRvEda,
+            baseEchoRvEsa: data.baseEchoRvEsa,
+            baseEchoRvFac: data.baseEchoRvFac,
+            baseEchoTapse: data.baseEchoTapse,
+            baseEchoRvLongDiameter: data.baseEchoRvLongDiameter,
+            baseEchoRvTransverseDiameter: data.baseEchoRvTransverseDiameter,
+            baseEchoTdiRvS: data.baseEchoTdiRvS,
+            baseEchoTdiRvE: data.baseEchoTdiRvE,
+            baseEchoTdiRvA: data.baseEchoTdiRvA,
+            baseEchoTvE: data.baseEchoTvE,
+            baseEchoTvA: data.baseEchoTvA,
+            baseEchoTrVelocity: data.baseEchoTrVelocity,
+            baseEchoMpaVelocity: data.baseEchoMpaVelocity,
+            checkMriEcv: data.checkMriEcv,
+            checkMriHct: data.checkMriHct,
             checkMriRightPost: data.checkMriRightPost,
             checkMriRightNative: data.checkMriRightNative,
             checkMriBloodPost: data.checkMriBloodPost,
             checkMriBloodNative: data.checkMriBloodNative,
-            checkMriHct: data.checkMriHct,
-            checkMriEcv: data.checkMriEcv,
+            checkMriRvedv: data.checkMriRvedv,
+            checkMriRvesv: data.checkMriRvesv,
+            checkMriRvef: data.checkMriRvef,
             allergyHistory: data.allergyHistory ?? false,
-            medicalHistory: data.medicalHistory ?? false,
             metalImplantHistory: data.metalImplantHistory ?? false,
             isRct: data.isRct ?? false,
-        }).then(res => {
+            patientStatus: data.patientStatus,
+            gravidityTime: data.gravidityTime,
+            productMode: data.productMode,
+            familyHistory: data.familyHistory ?? false,
+            medication: data.medication ?? false,
+            medicationDetail: data.medicationDetail,
+        }
+        return PatientSaveOrEdit(submitData).then(res => {
             message.success(res.data)
             baseFormRef.current?.close()
             tableRef.current?.getTableData();
