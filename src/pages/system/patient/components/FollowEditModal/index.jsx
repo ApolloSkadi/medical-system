@@ -88,7 +88,10 @@ export default forwardRef(({
                 setFormData={setFormData}
             />
             {
-                formData?.followupType === 3 &&
+                (
+                    formData?.followupType === 3 ||
+                    formData?.followupType === 4
+                ) &&
                 <MriEcvCalculate
                     formData={formData}
                     setFormData={setFormData}
