@@ -11,7 +11,6 @@ const rvefCalculate = ([rvedv, rvesv]) => {
 export default ({ 
     formData, 
     setFormData,
-    isRv = true, 
 }) => {
     const form = Form.useFormInstance();
     
@@ -107,31 +106,29 @@ export default ({
                     </Form.Item>
                 </Col>
             </Row>
-            { isRv && (
-                <Row gutter={24}>
-                    <Col span={8}>
-                        <Form.Item label="RVEDV(ml)" name={"checkMriRvedv"}>
-                            <BaseAntdInput float/>
-                        </Form.Item>
-                    </Col>
-                    <Col span={8}>
-                        <Form.Item label="RVESV(ml)" name={"checkMriRvesv"}>
-                            <BaseAntdInput float/>
-                        </Form.Item>
-                    </Col>
-                    <Col span={8}>
-                        <Form.Item label="RVEF(%)" name={"checkMriRvef"}>
-                            <AutoCalculateInput
-                                name="checkMriRvef"
-                                watchNames={["checkMriRvedv", "checkMriRvesv"]}
-                                calculate={rvefCalculate}
-                                setFormData={setFormData}
-                                inputProps={{suffix: '%'}}
-                            />
-                        </Form.Item>
-                    </Col>
-                </Row>
-            )}
+            <Row gutter={24}>
+                <Col span={8}>
+                    <Form.Item label="RVEDV(ml)" name={"checkMriRvedv"}>
+                        <BaseAntdInput float/>
+                    </Form.Item>
+                </Col>
+                <Col span={8}>
+                    <Form.Item label="RVESV(ml)" name={"checkMriRvesv"}>
+                        <BaseAntdInput float/>
+                    </Form.Item>
+                </Col>
+                <Col span={8}>
+                    <Form.Item label="RVEF(%)" name={"checkMriRvef"}>
+                        <AutoCalculateInput
+                            name="checkMriRvef"
+                            watchNames={["checkMriRvedv", "checkMriRvesv"]}
+                            calculate={rvefCalculate}
+                            setFormData={setFormData}
+                            inputProps={{suffix: '%'}}
+                        />
+                    </Form.Item>
+                </Col>
+            </Row>
         </Card>
     );
 };

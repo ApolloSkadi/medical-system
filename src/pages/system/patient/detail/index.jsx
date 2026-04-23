@@ -160,6 +160,7 @@ export default () => {
             followupEchoTvA: data.followupEchoTvA,
             followupEchoTrVelocity: data.followupEchoTrVelocity,
             followupEchoMpaVelocity: data.followupEchoMpaVelocity,
+            followupTricuspidAnnulus: data.followupTricuspidAnnulus,
             checkMriEcv: data.checkMriEcv,
             checkMriHct: data.checkMriHct,
             checkMriRightPost: data.checkMriRightPost,
@@ -177,6 +178,7 @@ export default () => {
             status: data.status,
             medication: data.medication ?? false,
             medicationDetail: data.medicationDetail,
+            bloodPotassium: data.bloodPotassium
         };
         return FollowSaveOrEdit(submitData).then(res => {
             message.success(res.data);
@@ -252,8 +254,7 @@ export default () => {
             balloonWidth: data.balloonWidth,
             balloonDilationCounts: data.balloonDilationCounts,
             aftRightSystolicPressure: data.aftRightSystolicPressure,
-            aftRightDiastolicPressure: data.aftRightDiastolicPressure,
-            aftRightAveragePressure: data.aftRightAveragePressure,
+            pulmonaryPressure: data.pulmonaryPressure,
             transvalvularPressureGradient: data.transvalvularPressureGradient,
         };
         return SurgerySaveOrEdit(submitData).then(res => {
@@ -321,7 +322,6 @@ export default () => {
                     <Descriptions.Item label="门诊号">{data?.outpatientNo || '-'}</Descriptions.Item>
                     <Descriptions.Item label="住院号">{data?.inpatientNo || '-'}</Descriptions.Item>
                     <Descriptions.Item label="出生日期">{formatDate(data?.birthDate)}</Descriptions.Item>
-                    <Descriptions.Item label="手术日龄">{data?.surgeryAge || '-'}</Descriptions.Item>
                     <Descriptions.Item label="联系电话">{data?.phone || '-'}</Descriptions.Item>
                 </Descriptions>
 
@@ -372,6 +372,7 @@ export default () => {
                         <Descriptions.Item label="TV-A(m/s)">{formatValue(data?.baseEchoTvA)}</Descriptions.Item>
                         <Descriptions.Item label="TR流速(m/s)">{formatValue(data?.baseEchoTrVelocity)}</Descriptions.Item>
                         <Descriptions.Item label="MPA流速(m/s)">{formatValue(data?.baseEchoMpaVelocity)}</Descriptions.Item>
+                        <Descriptions.Item label="三尖瓣瓣环(mm)">{formatValue(data?.baseTricuspidAnnulus)}</Descriptions.Item>
                     </Descriptions>
                 </Card>
 
@@ -405,11 +406,13 @@ export default () => {
                     column={4}
                     size="small"
                 >
+                    <Descriptions.Item label="血钾(mmol/L)">{formatValue(data?.bloodPotassium)}</Descriptions.Item>
                     <Descriptions.Item label="过敏史">{formatSwitch(data?.allergyHistory)}</Descriptions.Item>
-                    <Descriptions.Item label="金属植入史">{formatSwitch(data?.metalImplantHistory)}</Descriptions.Item>
+                    <Descriptions.Item label="是否二次手术">{formatYesNo(data?.isDoubleSurgery)}</Descriptions.Item>
                     <Descriptions.Item label="是否RCT">{formatYesNo(data?.isRct)}</Descriptions.Item>
                     <Descriptions.Item label="家族史">{formatSwitch(data?.familyHistory)}</Descriptions.Item>
-                    <Descriptions.Item label="孕产次">{formatValue(data?.gravidityTime)}</Descriptions.Item>
+                    <Descriptions.Item label="孕产次G">{formatValue(data?.gravidityTime)}</Descriptions.Item>
+                    <Descriptions.Item label="孕产次P">{formatValue(data?.gravidityPTime)}</Descriptions.Item>
                     <Descriptions.Item label="生产方式">{formatProductMode(data?.productMode)}</Descriptions.Item>
                     <Descriptions.Item label="用药/干预措施">{formatSwitch(data?.medication)}</Descriptions.Item>
                     <Descriptions.Item label="用药/干预措施详情" span={4}>{formatValue(data?.medicationDetail)}</Descriptions.Item>
@@ -423,7 +426,6 @@ export default () => {
                         <Button className="mr-2" icon={<ReloadOutlined />} onClick={() => surgeryTableRef.current?.initPageSearch()}>刷新</Button>
                         <Button type={'primary'} icon={<PlusOutlined />} onClick={() => openSurgeryModal({
                             patientId: id,
-                            surgeryAge: data?.surgeryAge
                         })}>新增</Button>
                     </Flex>
                     <BaseAntdTable

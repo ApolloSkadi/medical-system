@@ -17,17 +17,19 @@ export default ({
     return (
         <Card title={title} size="small" className="mb-4">
             <Row gutter={12}>
-                <Col span={8}>
+                <Col span={12}>
                     <Form.Item label="RV-EDA(cm²)" name={field('EchoRvEda')}>
                         <BaseAntdInput float/>
                     </Form.Item>
                 </Col>
-                <Col span={8}>
+                <Col span={12}>
                     <Form.Item label="RV-ESA(cm²)" name={field('EchoRvEsa')}>
                         <BaseAntdInput float/>
                     </Form.Item>
                 </Col>
-                <Col span={8}>
+            </Row>
+            <Row gutter={12}>
+                <Col span={12}>
                     <Form.Item label="RV-FAC(%)" name={field('EchoRvFac')}>
                         <AutoCalculateInput
                             name={field('EchoRvFac')}
@@ -38,37 +40,40 @@ export default ({
                         />
                     </Form.Item>
                 </Col>
-            </Row>
-            <Row gutter={12}>
-                <Col span={8}>
+                <Col span={12}>
                     <Form.Item label="TAPSE(cm)" name={field('EchoTapse')}>
                         <BaseAntdInput float/>
                     </Form.Item>
                 </Col>
-                <Col span={8}>
+            </Row>
+            <Row gutter={12}>
+                <Col span={12}>
                     <Form.Item label="右心室长径(mm)" name={field('EchoRvLongDiameter')}>
                         <BaseAntdInput float/>
                     </Form.Item>
                 </Col>
-                <Col span={8}>
+                <Col span={12}>
                     <Form.Item label="右心室横径(mm)" name={field('EchoRvTransverseDiameter')}>
                         <BaseAntdInput float/>
                     </Form.Item>
                 </Col>
-            </Row>
-            <Row gutter={12}>
-                <Col span={8}>
+                <Col span={12}>
                     <Form.Item label="TDI-RV-S(cm/s)" name={field('EchoTdiRvS')}>
                         <BaseAntdInput float/>
                     </Form.Item>
                 </Col>
-                <Col span={8}>
+                <Col span={12}>
                     <Form.Item label="TDI-RV-E'(cm/s)" name={field('EchoTdiRvE')}>
                         <BaseAntdInput float/>
                     </Form.Item>
                 </Col>
-                <Col span={8}>
+                <Col span={12}>
                     <Form.Item label="TDI-RV-A'(cm/s)" name={field('EchoTdiRvA')}>
+                        <BaseAntdInput float/>
+                    </Form.Item>
+                </Col>
+                <Col span={12}>
+                    <Form.Item label="三尖瓣瓣环(mm)" name={field('TricuspidAnnulus')}>
                         <BaseAntdInput float/>
                     </Form.Item>
                 </Col>

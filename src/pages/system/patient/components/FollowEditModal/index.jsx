@@ -7,6 +7,7 @@ import BaseAntdSelect from "@/component/BaseAntdSelect/index.jsx";
 import Constant from "@/utils/Constant.jsx";
 import {easyNotNull} from "@/utils/antd-validator.js";
 import EchoCard from "@/component/EchoCard/index.jsx";
+import BaseAntdInput from "@/component/BaseAntdInput/index.jsx";
 
 export default forwardRef(({
     formData,
@@ -86,11 +87,14 @@ export default forwardRef(({
                 prefix="followup"
                 setFormData={setFormData}
             />
-            <MriEcvCalculate
-                formData={formData}
-                setFormData={setFormData}
-                isRv={formData?.followupType === 3}
-            />
+            {
+                formData?.followupType === 3 &&
+                <MriEcvCalculate
+                    formData={formData}
+                    setFormData={setFormData}
+                />
+            }
+            
             <Row gutter={12} className={'mt-2'}>
                 <Col span={12}>
                     <Form.Item
@@ -134,24 +138,13 @@ export default forwardRef(({
             <Row gutter={12}>
                 <Col span={12}>
                     <Form.Item
-                        label={'用药/干预措施'}
-                        name={'medication'}
-                        valuePropName="checked"
+                        label={'血钾水平(mmol/L)'}
+                        name={'bloodPotassium'}
                     >
-                        <Switch checkedChildren="有" unCheckedChildren="无" />
+                        <BaseAntdInput float suffix="mmol/L"/>
                     </Form.Item>
                 </Col>
             </Row>
-            <Form.Item noStyle shouldUpdate={(prev, cur) => prev.medication !== cur.medication}>
-                {({getFieldValue}) => getFieldValue('medication') ? (
-                    <Form.Item
-                        label={'用药/干预措施详情'}
-                        name={'medicationDetail'}
-                    >
-                        <Input.TextArea/>
-                    </Form.Item>
-                ) : null}
-            </Form.Item>
             <Form.Item
                 label={'备注'}
                 name={'remark'}

@@ -135,6 +135,7 @@ export default () => {
             baseEchoTvA: data.baseEchoTvA,
             baseEchoTrVelocity: data.baseEchoTrVelocity,
             baseEchoMpaVelocity: data.baseEchoMpaVelocity,
+            baseTricuspidAnnulus: data.baseTricuspidAnnulus,
             checkMriEcv: data.checkMriEcv,
             checkMriHct: data.checkMriHct,
             checkMriRightPost: data.checkMriRightPost,
@@ -149,10 +150,13 @@ export default () => {
             isRct: data.isRct ?? false,
             patientStatus: data.patientStatus,
             gravidityTime: data.gravidityTime,
+            gravidityPTime: data.gravidityPTime,
             productMode: data.productMode,
             familyHistory: data.familyHistory ?? false,
             medication: data.medication ?? false,
             medicationDetail: data.medicationDetail,
+            bloodPotassium: data.bloodPotassium,
+            isDoubleSurgery: data.isDoubleSurgery ?? false,
         }
         return PatientSaveOrEdit(submitData).then(res => {
             message.success(res.data)
