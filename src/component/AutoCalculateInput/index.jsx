@@ -70,7 +70,6 @@ export default ({
     return (
         <BaseAntdInput
             float
-            disabled
             value={value}
             onChange={onChange}
             {...inputProps}
