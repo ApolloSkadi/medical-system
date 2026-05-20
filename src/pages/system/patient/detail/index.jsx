@@ -162,14 +162,23 @@ export default () => {
             followupEchoMpaVelocity: data.followupEchoMpaVelocity,
             followupTricuspidAnnulus: data.followupTricuspidAnnulus,
             checkMriEcv: data.checkMriEcv,
+            checkMriLeftEcv: data.checkMriLeftEcv,
             checkMriHct: data.checkMriHct,
             checkMriRightPost: data.checkMriRightPost,
             checkMriRightNative: data.checkMriRightNative,
+            checkMriLeftPost: data.checkMriLeftPost,
+            checkMriLeftNative: data.checkMriLeftNative,
             checkMriBloodPost: data.checkMriBloodPost,
             checkMriBloodNative: data.checkMriBloodNative,
             checkMriRvedv: data.checkMriRvedv,
             checkMriRvesv: data.checkMriRvesv,
             checkMriRvef: data.checkMriRvef,
+            pulmonaryArteryFlow: data.pulmonaryArteryFlow,
+            pulmonaryMaxFlowVelocity: data.pulmonaryMaxFlowVelocity,
+            tricuspidPulseFlow: data.tricuspidPulseFlow,
+            tricuspidMaxFlowVelocity: data.tricuspidMaxFlowVelocity,
+            tricuspidRefluxFraction: data.tricuspidRefluxFraction,
+            rightVentricularThickness: data.rightVentricularThickness,
             protocolDeviation: data.protocolDeviation ?? false,
             protocolDeviationDetail: data.protocolDeviationDetail,
             adverseEvent: data.adverseEvent ?? false,
@@ -351,30 +360,8 @@ export default () => {
                     className="mb-4"
                 >
                     <Descriptions.Item label="基线检查日期">{formatDate(data?.baseCheckDate)}</Descriptions.Item>
-                    <Descriptions.Item label="基线检查心超结果" span={2}>{data?.baseCheckResult || '-'}</Descriptions.Item>
+                    <Descriptions.Item label="术前心超结果" span={2}>{data?.baseCheckResult || '-'}</Descriptions.Item>
                 </Descriptions>
-
-                <Divider />
-
-                {/* 心脏超声检查 */}
-                <Card title="心脏超声检查" size="small" className="mb-4">
-                    <Descriptions bordered column={3} size="small">
-                        <Descriptions.Item label="RV-FAC(%)">{formatValue(data?.baseEchoRvFac)}</Descriptions.Item>
-                        <Descriptions.Item label="RV-EDA(cm²)">{formatValue(data?.baseEchoRvEda)}</Descriptions.Item>
-                        <Descriptions.Item label="RV-ESA(cm²)">{formatValue(data?.baseEchoRvEsa)}</Descriptions.Item>
-                        <Descriptions.Item label="TAPSE(cm)">{formatValue(data?.baseEchoTapse)}</Descriptions.Item>
-                        <Descriptions.Item label="右心室长径(mm)">{formatValue(data?.baseEchoRvLongDiameter)}</Descriptions.Item>
-                        <Descriptions.Item label="右心室横径(mm)">{formatValue(data?.baseEchoRvTransverseDiameter)}</Descriptions.Item>
-                        <Descriptions.Item label="TDI-RV-S(cm/s)">{formatValue(data?.baseEchoTdiRvS)}</Descriptions.Item>
-                        <Descriptions.Item label="TDI-RV-E'(cm/s)">{formatValue(data?.baseEchoTdiRvE)}</Descriptions.Item>
-                        <Descriptions.Item label="TDI-RV-A'(cm/s)">{formatValue(data?.baseEchoTdiRvA)}</Descriptions.Item>
-                        <Descriptions.Item label="TV-E(m/s)">{formatValue(data?.baseEchoTvE)}</Descriptions.Item>
-                        <Descriptions.Item label="TV-A(m/s)">{formatValue(data?.baseEchoTvA)}</Descriptions.Item>
-                        <Descriptions.Item label="TR流速(m/s)">{formatValue(data?.baseEchoTrVelocity)}</Descriptions.Item>
-                        <Descriptions.Item label="MPA流速(m/s)">{formatValue(data?.baseEchoMpaVelocity)}</Descriptions.Item>
-                        <Descriptions.Item label="三尖瓣瓣环(mm)">{formatValue(data?.baseTricuspidAnnulus)}</Descriptions.Item>
-                    </Descriptions>
-                </Card>
 
                 <Divider />
 
@@ -387,13 +374,22 @@ export default () => {
                     >
                         <Descriptions.Item label="右心室T1 post">{data?.checkMriRightPost || '-'}</Descriptions.Item>
                         <Descriptions.Item label="右心室T1 native">{data?.checkMriRightNative || '-'}</Descriptions.Item>
+                        <Descriptions.Item label="左心室T1 post">{data?.checkMriLeftPost || '-'}</Descriptions.Item>
+                        <Descriptions.Item label="左心室T1 native">{data?.checkMriLeftNative || '-'}</Descriptions.Item>
                         <Descriptions.Item label="血池T1 post">{data?.checkMriBloodPost || '-'}</Descriptions.Item>
                         <Descriptions.Item label="血池T1 native">{data?.checkMriBloodNative || '-'}</Descriptions.Item>
                         <Descriptions.Item label="HCT">{data?.checkMriHct || '-'}</Descriptions.Item>
-                        <Descriptions.Item label="ECV">{data?.checkMriEcv || '-'}</Descriptions.Item>
+                        <Descriptions.Item label="右心室ECV">{data?.checkMriEcv || '-'}</Descriptions.Item>
+                        <Descriptions.Item label="左心室ECV">{data?.checkMriLeftEcv || '-'}</Descriptions.Item>
                         <Descriptions.Item label="RVEDV(ml)">{formatValue(data?.checkMriRvedv)}</Descriptions.Item>
                         <Descriptions.Item label="RVESV(ml)">{formatValue(data?.checkMriRvesv)}</Descriptions.Item>
                         <Descriptions.Item label="RVEF(%)">{formatValue(data?.checkMriRvef)}</Descriptions.Item>
+                        <Descriptions.Item label="肺动脉瓣脉搏流量(ml)">{formatValue(data?.pulmonaryArteryFlow)}</Descriptions.Item>
+                        <Descriptions.Item label="肺动脉过瓣最大流速(cm/s)">{formatValue(data?.pulmonaryMaxFlowVelocity)}</Descriptions.Item>
+                        <Descriptions.Item label="三尖瓣脉搏流量(ml)">{formatValue(data?.tricuspidPulseFlow)}</Descriptions.Item>
+                        <Descriptions.Item label="三尖瓣过瓣最大流速(cm/s)">{formatValue(data?.tricuspidMaxFlowVelocity)}</Descriptions.Item>
+                        <Descriptions.Item label="三尖瓣反流分数(%)">{formatValue(data?.tricuspidRefluxFraction)}</Descriptions.Item>
+                        <Descriptions.Item label="右心室厚度(mm)">{formatValue(data?.rightVentricularThickness)}</Descriptions.Item>
                     </Descriptions>
                 </Card>
 
@@ -406,7 +402,6 @@ export default () => {
                     column={4}
                     size="small"
                 >
-                    <Descriptions.Item label="血钾(mmol/L)">{formatValue(data?.bloodPotassium)}</Descriptions.Item>
                     <Descriptions.Item label="过敏史">{formatSwitch(data?.allergyHistory)}</Descriptions.Item>
                     <Descriptions.Item label="是否二次手术">{formatYesNo(data?.isDoubleSurgery)}</Descriptions.Item>
                     <Descriptions.Item label="是否RCT">{formatYesNo(data?.isRct)}</Descriptions.Item>

@@ -83,10 +83,6 @@ export default forwardRef(({
             >
                 <Input.TextArea/>
             </Form.Item>
-            <EchoCard
-                prefix="followup"
-                setFormData={setFormData}
-            />
             {
                 (
                     formData?.followupType === 3 ||
@@ -138,16 +134,6 @@ export default forwardRef(({
                     </Form.Item>
                 ) : null}
             </Form.Item>
-            <Row gutter={12}>
-                <Col span={12}>
-                    <Form.Item
-                        label={'血钾水平(mmol/L)'}
-                        name={'bloodPotassium'}
-                    >
-                        <BaseAntdInput float suffix="mmol/L"/>
-                    </Form.Item>
-                </Col>
-            </Row>
             <Form.Item
                 label={'备注'}
                 name={'remark'}

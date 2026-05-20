@@ -166,23 +166,11 @@ export default forwardRef(({
             >
                 <Input.TextArea/>
             </Form.Item>
-            <EchoCard
-                prefix="base"
-                setFormData={setFormData}
-            />
             <MriEcvCalculate
                 formData={formData}
                 setFormData={setFormData}
             />
             <Row gutter={12}>
-                <Col span={12}>
-                    <Form.Item
-                        label={'血钾水平(mmol/L)'}
-                        name={'bloodPotassium'}
-                    >
-                        <BaseAntdInput float suffix="mmol/L"/>
-                    </Form.Item>
-                </Col>
                 <Col span={12}>
                     <Form.Item
                         label={'用药/干预措施'}
