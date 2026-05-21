@@ -415,6 +415,18 @@ export default () => {
 
                 <Divider />
 
+                <Descriptions
+                    title="备注"
+                    bordered
+                    column={1}
+                    size="small"
+                    className="mb-4"
+                >
+                    <Descriptions.Item label="备注">{formatValue(data?.remark)}</Descriptions.Item>
+                </Descriptions>
+
+                <Divider />
+
                 {/* 手术记录列表 */}
                 <Card title="手术记录" size="small" className="mb-4">
                     <Flex justify={'flex-end'} align={'center'} className="mb-4">

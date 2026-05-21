@@ -166,6 +166,7 @@ export default () => {
             medicationDetail: data.medicationDetail,
             bloodPotassium: data.bloodPotassium,
             isDoubleSurgery: data.isDoubleSurgery ?? false,
+            remark: data.remark,
         }
         return PatientSaveOrEdit(submitData).then(res => {
             message.success(res.data)

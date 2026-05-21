@@ -231,6 +231,12 @@ export default forwardRef(({
                     </Form.Item>
                 </Col>
             </Row>
+            <Form.Item
+                label={'备注'}
+                name={'remark'}
+            >
+                <Input.TextArea/>
+            </Form.Item>
 
         </BaseFormModal>
     )
