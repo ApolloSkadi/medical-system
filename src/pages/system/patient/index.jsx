@@ -205,8 +205,8 @@ export default () => {
             searchNo: searchNo,
             phone: phone,
             isRct: isRct,
-        }).then(res => {
-            const blob = new Blob([res.data])
+        }).then(blob => {
+            // 文件流响应: 直接使用返回的blob(勿再包一层, 否则内容会变成[object Object])
             const url = window.URL.createObjectURL(blob)
 
             const link = document.createElement('a')

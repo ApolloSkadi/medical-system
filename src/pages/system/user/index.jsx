@@ -3,6 +3,7 @@ import BaseAntdInput from "@/component/BaseAntdInput/index.jsx";
 import BaseAntdTable from "@/component/BaseAntdTable/index.jsx";
 import {useRef, useState} from "react";
 import {CreateUserInfo, EditUser, UserPage} from "@/api/system/user/index.js";
+import {UserRoleBindRoles} from "@/api/system/saas/index.js";
 import TableActionButtons from "@/component/TableActionButtons/index.jsx";
 import {Button, message, Modal, Tag} from "antd";
 import {FAntdInput} from "izid/dist/index.modern.mjs";
@@ -10,6 +11,7 @@ import BaseAntdSelect from "@/component/BaseAntdSelect/index.jsx";
 import Constant from "@/utils/Constant.jsx";
 import SearchBtnGroup from "@/component/SearchBtnGroup/index.jsx";
 import UserCreateModal from "@/pages/system/user/components/UserCreateModal";
+import RoleAssignModal from "@/pages/system/user/components/RoleAssignModal";
 import PwdChangeModal from "@/layout/header/components/PwdChangeModal";
 import StatusLabel from "@/component/StatusLabel/index.jsx";
 import {ExclamationCircleFilled} from "@ant-design/icons";
@@ -47,9 +49,18 @@ export default () => {
             dataIndex: 'type',
             key: 'type',
             render(value) {
-                if (value === 0) return <Tag color="blue">普通用户</Tag>
+                if (value === 0 || value === 2) return <Tag color="blue">普通用户</Tag>
                 if (value === 1) return <Tag color="green">管理员</Tag>
+                if (value === 3) return <Tag color="geekblue">平台管理员</Tag>
                 return <Tag>未知</Tag>;
+            }
+        },
+        {
+            title:'角色',
+            dataIndex: 'roleNames',
+            key: 'roleNames',
+            render(value) {
+                return (value ?? []).length ? value.join('、') : '-';
             }
         },
         {
@@ -68,6 +79,7 @@ export default () => {
             key: 'action',
             render(_,row){
                 return <TableActionButtons>
+                    <Button type={'link'} onClick={() => roleModalRef.current?.open(row)}>分配角色</Button>
                     <Button type={'link'} onClick={() => changePwdRef.current?.open({
                         id: row.id
                     })}>修改密码</Button>
@@ -109,7 +121,15 @@ export default () => {
     // 修改密码
     const changePwdRef = useRef();
     const [changePwdForm, setChangePwdForm] = useState();
-    // 修改密码方法
+    // 分配角色
+    const roleModalRef = useRef();
+    const submitRoles = (row, roleIds) => {
+        return UserRoleBindRoles({userId: row.id, roleIds}).then(res => {
+            message.success(res.data)
+            roleModalRef.current?.close()
+            tableRef.current?.getTableData()
+        })
+    }
     const pwdSubmit = (data) => {
         return EditUser(data).then((res)=>{
             message.success(res.data)
@@ -186,6 +206,11 @@ export default () => {
                 formData={changePwdForm}
                 setFormData={setChangePwdForm}
                 onSubmit={pwdSubmit}
+            />
+            {/*  分配角色  */}
+            <RoleAssignModal
+                ref={roleModalRef}
+                onSubmit={submitRoles}
             />
         </>
     );

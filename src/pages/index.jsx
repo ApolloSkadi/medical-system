@@ -1,5 +1,5 @@
 import {useOutlet} from "react-router-dom";
-import {ConfigProvider, theme} from "antd";
+import {App, ConfigProvider, theme} from "antd";
 import zhCN from "antd/lib/locale/zh_CN";
 
 export default () => {
@@ -15,7 +15,10 @@ export default () => {
                 algorithm: theme[systemThemeWrapper]
             }}
         >
-            {currentOutlet}
+            {/* App组件使message/modal等静态方法消费主题context，消除antd警告 */}
+            <App>
+                {currentOutlet}
+            </App>
         </ConfigProvider>
     )
 }

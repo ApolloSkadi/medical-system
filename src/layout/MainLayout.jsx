@@ -12,19 +12,21 @@ export default ({children}) => {
         <>
             <Layout style={{ minHeight: '100vh' }}>
                 <Sider
-                    collapsedWidth={50}
+                    className={'app-sider'}
+                    width={208}
+                    collapsedWidth={64}
                     breakpoint={"xs"}
-                    onBreakpoint={(broken) => {
-                        console.log('触发响应式',broken);
-                    }}
+                    trigger={null}
                     collapsed={menuCollapsed}
+                    // 小屏自动收起, 大屏保留用户上次的选择
+                    onBreakpoint={(broken) => { if (broken) setMenuCollapsed(true) }}
                     onCollapse={(value) => {setMenuCollapsed(value)}}
                     collapsible
                 >
                     <SideSystem />
                 </Sider>
                 <Layout>
-                    <Header style={{ background: '#fff', padding: 0 }}>
+                    <Header className={'app-header'}>
                         <HeaderSystem />
                     </Header>
                     <Content className={'main-content'}>

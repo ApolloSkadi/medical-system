@@ -1,0 +1,686 @@
+// ===== 首页看板: 布局优化 + 纯 CSS 动效(不依赖图片资源) =====
+
+@keyframes dashRise {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes dashRowIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes dashSheen {
+    0% {
+        opacity: 0;
+        transform: translateX(0) skewX(-18deg);
+    }
+    25% {
+        opacity: .9;
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(420%) skewX(-18deg);
+    }
+}
+
+@keyframes dashAurora {
+    0% {
+        transform: translate3d(-6%, -12%, 0) scale(1);
+    }
+    50% {
+        transform: translate3d(6%, 6%, 0) scale(1.08);
+    }
+    100% {
+        transform: translate3d(-4%, 10%, 0) scale(1.02);
+    }
+}
+
+@keyframes dashPulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 77, 79, .5);
+    }
+    70% {
+        box-shadow: 0 0 0 8px rgba(255, 77, 79, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(255, 77, 79, 0);
+    }
+}
+
+.dash {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    // 通用入场容器(进入视口后播放, 支持 --delay 交错)
+    .dash-reveal {
+        opacity: 0;
+        transform: translateY(16px);
+
+        &.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+            animation: dashRise .62s cubic-bezier(.22, 1, .36, 1) backwards;
+            animation-delay: var(--delay, 0ms);
+        }
+    }
+
+    .dash-reveal + .dash-reveal {
+        margin-top: 12px;
+    }
+
+    .dash-reveal-fill {
+        height: 100%;
+
+        > .ant-card {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+
+            > .ant-card-body {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .dash-table {
+                flex: 1;
+            }
+        }
+    }
+
+    // ===== 顶部欢迎区 =====
+    .dash-hero {
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 18px 20px 0;
+        border-radius: 16px;
+        background: linear-gradient(120deg, #eef4ff 0%, #f7faff 45%, #eefaf6 100%);
+        border: 1px solid rgba(24, 144, 255, .1);
+
+        // 缓慢流动的光晕(纯 CSS, 无图片)
+        &::before {
+            content: '';
+            position: absolute;
+            inset: -45% -12%;
+            pointer-events: none;
+            background: radial-gradient(closest-side, rgba(45, 183, 245, .22), transparent 72%);
+            animation: dashAurora 18s ease-in-out infinite alternate;
+        }
+
+        > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        // 刷新按钮固定右上角, 小屏换行时也不挤占标题
+        .dash-hero-actions {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 2;
+        }
+
+        .dash-hero-main {
+            padding-right: 44px;
+        }
+    }
+
+    .dash-hero-greet {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 19px;
+        font-weight: 600;
+        color: #1f2d3d;
+    }
+
+    .dash-role-tag {
+        margin: 0;
+        border-radius: 20px;
+        font-weight: 400;
+    }
+
+    .dash-hero-sub {
+        margin-top: 6px;
+        font-size: 12.5px;
+        color: #6b7a90;
+    }
+
+    .dash-refresh {
+        border-radius: 50%;
+    }
+
+    // ===== 快捷入口 =====
+    .dash-quick {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        width: 100%;
+        margin: 16px -20px 0;
+        padding: 10px 20px;
+        border-radius: 0 0 16px 16px;
+        background: rgba(255, 255, 255, .55);
+        border-top: 1px solid rgba(24, 144, 255, .08);
+    }
+
+    .quick-item {
+        flex: 1 1 168px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 12px;
+        border-radius: 12px;
+        background: #fff;
+        border: 1px solid rgba(0, 0, 0, .045);
+        cursor: pointer;
+        text-align: left;
+        animation: dashRise .55s cubic-bezier(.22, 1, .36, 1) backwards;
+        animation-delay: calc(var(--i, 0) * 70ms + 140ms);
+        transition: transform .3s cubic-bezier(.22, 1, .36, 1), box-shadow .3s ease, border-color .3s ease;
+
+        &:hover {
+            transform: translateY(-3px);
+            border-color: transparent;
+            box-shadow: 0 14px 22px -16px var(--accent);
+
+            .quick-arrow {
+                transform: translateX(3px);
+                color: var(--accent);
+            }
+
+            .quick-icon {
+                transform: scale(1.06) rotate(-4deg);
+            }
+        }
+
+        &:active {
+            transform: translateY(-1px) scale(.995);
+        }
+    }
+
+    .quick-icon {
+        flex: 0 0 30px;
+        width: 30px;
+        height: 30px;
+        display: grid;
+        place-items: center;
+        border-radius: 9px;
+        font-size: 15px;
+        color: #fff;
+        background: var(--accent);
+        transition: transform .3s cubic-bezier(.22, 1, .36, 1);
+    }
+
+    .quick-text {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        flex: 1;
+    }
+
+    .quick-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: #25324a;
+        line-height: 1.4;
+    }
+
+    .quick-desc {
+        font-size: 11.5px;
+        color: #93a0b1;
+        line-height: 1.4;
+    }
+
+    .quick-arrow {
+        font-size: 11px;
+        color: #c3cbd6;
+        transition: transform .3s cubic-bezier(.22, 1, .36, 1), color .3s ease;
+    }
+
+    // ===== 指标卡 =====
+    .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(176px, 1fr));
+        gap: 12px;
+    }
+
+    .kpi-card {
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 16px;
+        border-radius: 14px;
+        background: #fff;
+        border: 1px solid rgba(0, 0, 0, .05);
+        box-shadow: 0 1px 2px rgba(16, 24, 40, .04);
+        opacity: 0;
+        transform: translateY(14px);
+        transition: transform .34s cubic-bezier(.22, 1, .36, 1), box-shadow .34s ease, border-color .34s ease;
+
+        &.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+            animation: dashRise .6s cubic-bezier(.22, 1, .36, 1) backwards;
+            animation-delay: calc(var(--i, 0) * 70ms);
+        }
+
+        // 悬浮高光扫过
+        &::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -60%;
+            width: 40%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0;
+            background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .75), transparent);
+            transform: skewX(-18deg);
+        }
+
+        &:hover {
+            transform: translateY(-6px);
+            border-color: transparent;
+            box-shadow: 0 18px 30px -20px var(--accent), 0 2px 6px rgba(16, 24, 40, .06);
+
+            &::after {
+                animation: dashSheen .9s ease;
+            }
+
+            .kpi-icon {
+                transform: scale(1.06) rotate(-5deg);
+            }
+        }
+    }
+
+    .kpi-icon {
+        flex: 0 0 40px;
+        width: 40px;
+        height: 40px;
+        display: grid;
+        place-items: center;
+        border-radius: 12px;
+        font-size: 18px;
+        color: var(--accent);
+        background: var(--accent-soft, rgba(45, 183, 245, .13));
+        transition: transform .34s cubic-bezier(.22, 1, .36, 1);
+    }
+
+    .kpi-body {
+        min-width: 0;
+    }
+
+    .kpi-value {
+        display: flex;
+        align-items: baseline;
+        font-size: 22px;
+        font-weight: 700;
+        line-height: 1.2;
+        color: #1f2d3d;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .kpi-unit {
+        margin-left: 3px;
+        font-size: 11.5px;
+        font-weight: 400;
+        color: #a3adbb;
+    }
+
+    .kpi-label {
+        margin-top: 2px;
+        font-size: 12.5px;
+        color: #8593a6;
+        white-space: nowrap;
+    }
+
+    .kpi-dot {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #ff4d4f;
+        animation: dashPulse 2s ease-out infinite;
+    }
+
+    // ===== 内容卡片 =====
+    .dash-card {
+        border-radius: 14px;
+        border: 1px solid rgba(0, 0, 0, .05);
+        box-shadow: 0 1px 2px rgba(16, 24, 40, .04);
+        overflow: hidden;
+        transition: box-shadow .3s ease;
+
+        &:hover {
+            box-shadow: 0 16px 32px -26px rgba(16, 24, 40, .45);
+        }
+
+        .ant-card-head {
+            min-height: 44px;
+            padding: 0 16px;
+            border-bottom: 1px solid rgba(0, 0, 0, .045);
+        }
+
+        .ant-card-head-title {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .ant-card-body {
+            padding: 14px 16px;
+        }
+    }
+
+    // ===== 诊断组环形图 =====
+    .dash-ring {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    .dash-ring-chart {
+        position: relative;
+        flex: 0 0 148px;
+        width: 148px;
+        height: 148px;
+
+        svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+    }
+
+    .dash-ring-track {
+        fill: none;
+        stroke: rgba(140, 140, 140, .13);
+        stroke-width: 14;
+    }
+
+    .dash-ring-seg {
+        fill: none;
+        stroke-width: 14;
+        stroke-linecap: round;
+        transition: stroke-dasharray 1.15s cubic-bezier(.22, 1, .36, 1), stroke-dashoffset 1.15s cubic-bezier(.22, 1, .36, 1);
+
+        &.seg-ps {
+            stroke: #2db7f5;
+        }
+
+        &.seg-pa {
+            stroke: #722ed1;
+        }
+    }
+
+    .dash-ring-center {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+    }
+
+    .dash-ring-percent {
+        font-size: 24px;
+        font-weight: 700;
+        color: #1f2d3d;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .dash-ring-caption {
+        font-size: 11.5px;
+        color: #98a2b3;
+    }
+
+    .dash-ring-legend {
+        flex: 1 1 150px;
+        min-width: 140px;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+
+        li {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12.5px;
+            color: #5b6b7f;
+        }
+    }
+
+    .dash-ring.is-visible .dash-ring-legend li {
+        animation: dashRise .5s cubic-bezier(.22, 1, .36, 1) backwards;
+
+        &:nth-child(1) {
+            animation-delay: .12s;
+        }
+
+        &:nth-child(2) {
+            animation-delay: .2s;
+        }
+
+        &:nth-child(3) {
+            animation-delay: .28s;
+        }
+    }
+
+    .legend-dot {
+        flex: 0 0 8px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--accent);
+    }
+
+    .legend-label {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .legend-value {
+        font-weight: 600;
+        color: #1f2d3d;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .legend-total {
+        padding-top: 8px;
+        border-top: 1px dashed rgba(0, 0, 0, .07);
+    }
+
+    // ===== 随访状态进度 =====
+    .status-row {
+        margin-bottom: 14px;
+
+        &:last-of-type {
+            margin-bottom: 6px;
+        }
+
+        .ant-progress {
+            margin: 0;
+            line-height: 1;
+        }
+
+        .ant-progress-bg {
+            transition: width .95s cubic-bezier(.22, 1, .36, 1);
+        }
+    }
+
+    .status-row-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 5px;
+        font-size: 12.5px;
+        color: #5b6b7f;
+    }
+
+    .status-dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        margin-right: 6px;
+        border-radius: 50%;
+        background: var(--accent);
+    }
+
+    .status-row-value {
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .status-tip {
+        padding-top: 4px;
+        font-size: 12px;
+        color: #8593a6;
+    }
+
+    // 卡片底部提示(把表格拉满卡片高度, 避免整块空白)
+    .dash-card-foot {
+        margin-top: 12px;
+        padding-top: 10px;
+        border-top: 1px dashed rgba(0, 0, 0, .06);
+        font-size: 12px;
+        color: #9aa5b4;
+    }
+
+    .foot-link {
+        color: #1677ff;
+        cursor: pointer;
+        transition: opacity .25s ease;
+
+        &:hover {
+            opacity: .75;
+        }
+    }
+
+    // ===== 表格 =====
+    .dash-table {
+        .ant-table {
+            background: transparent;
+        }
+
+        .ant-table-thead > tr > th {
+            background: rgba(140, 140, 140, .06) !important;
+            font-size: 12.5px;
+            font-weight: 600;
+        }
+
+        .ant-table-tbody > tr > td {
+            font-size: 12.5px;
+            transition: background-color .25s ease;
+        }
+
+        .ant-table-tbody > tr:hover > td {
+            background: rgba(45, 183, 245, .05) !important;
+        }
+
+        .ant-table-tbody > tr {
+            animation: dashRowIn .45s cubic-bezier(.22, 1, .36, 1) backwards;
+        }
+
+        @for $i from 1 through 6 {
+            .ant-table-tbody > tr:nth-child(#{$i}) {
+                animation-delay: #{$i * 45}ms;
+            }
+        }
+    }
+
+    // ===== 骨架屏 =====
+    .dash-skeleton {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .dash-skeleton .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(176px, 1fr));
+        gap: 12px;
+    }
+}
+
+// 小屏适配
+@media (max-width: 768px) {
+    .dash {
+        .dash-hero {
+            padding: 14px 14px 0;
+        }
+
+        .dash-hero-greet {
+            font-size: 16.5px;
+        }
+
+        .dash-quick {
+            margin: 12px -14px 0;
+            padding: 10px 14px;
+        }
+
+        .quick-item {
+            flex: 1 1 100%;
+        }
+
+        .kpi-grid,
+        .dash-skeleton .kpi-grid {
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        }
+
+        .kpi-value {
+            font-size: 19px;
+        }
+
+        .dash-ring-chart {
+            margin: 0 auto;
+        }
+    }
+}
+
+// 尊重系统"减少动态效果"设置
+@media (prefers-reduced-motion: reduce) {
+    .dash {
+        .dash-reveal,
+        .kpi-card,
+        .quick-item {
+            opacity: 1 !important;
+            transform: none !important;
+            animation: none !important;
+        }
+
+        .dash-hero::before,
+        .kpi-dot,
+        .dash-ring-seg,
+        .dash-table .ant-table-tbody > tr,
+        .dash-ring.is-visible .dash-ring-legend li {
+            animation: none !important;
+            transition: none !important;
+        }
+    }
+}

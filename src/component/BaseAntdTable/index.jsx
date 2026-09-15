@@ -78,6 +78,11 @@ export default forwardRef(
                         totalCount = tableData.total ?? totalCount;
                         tableData = tableData.list ?? [];
                     }
+                    // 容错: 后端异常返回(如404错误对象)不是数组时置空，避免Table渲染崩溃
+                    if (!Array.isArray(tableData)) {
+                        tableData = [];
+                        totalCount = 0;
+                    }
 
                     setTotal(totalCount);
                     setTableData(tableData);

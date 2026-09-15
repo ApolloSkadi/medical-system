@@ -1,18 +1,11 @@
 import {defineConfig} from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
-import {viteMockServe} from "vite-plugin-mock";
 
 // https://vite.dev/config/
 export default defineConfig({
     plugins: [
         react(),
-        // viteMockServe({
-        //     mockPath: 'src/mock',  // 正确指向mock目录
-        //     localEnabled: true,     // 开发环境启用
-        //     watchFiles: true,       // 监听文件变化
-        //     logger: true           // 启用日志
-        // }),
     ],
     css: {
         preprocessorOptions: {
@@ -33,12 +26,11 @@ export default defineConfig({
         post: 8999,
         strictPort: false,
         open: true,
-        // proxy配置 - 注释掉以使用mock数据
-        // 如需连接真实后端，取消下方注释
+        // 后端接口代理
         proxy: {
             '/system':{
-                // target: 'http://localhost:8077',
-                target: 'https://api.followupsystem.online',
+                target: 'http://localhost:8077',
+                // target: 'https://api.followupsystem.online',
                 changeOrigin: true,
             }
         },

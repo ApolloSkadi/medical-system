@@ -32,3 +32,7 @@ export const FollowInstance = createAxiosInstance({baseURL: '/system/follow'})
 export const SurgeryInstance = createAxiosInstance({baseURL: '/system/surgery'})
 // 消息通知接口
 export const SubscribeInstance = createAxiosInstance({baseURL: '/system/subscribe'})
+// SaaS多租户管理接口
+export const SaasInstance = createAxiosInstance({baseURL: '/system/saas'})
+// SaaS临床业务接口
+export const ClinicalInstance = createAxiosInstance({baseURL: '/system/clinical'})

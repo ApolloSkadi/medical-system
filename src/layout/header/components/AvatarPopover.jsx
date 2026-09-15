@@ -3,16 +3,25 @@ import {EditOutlined, LogoutOutlined, UserOutlined} from "@ant-design/icons";
 import React from "react";
 import useAuthStore from "@/store/useAuthStore.js";
 
+const ROLE_LABEL = {
+    admin: '管理员',
+    user: '普通用户',
+    platform: '平台管理员',
+}
+
 export default ({
     onLogout,
     onEditPassword,
     children
 }) => {
     const userInfo = useAuthStore().userInfo
+    const roleLabel = ROLE_LABEL[userInfo?.role] ?? '普通用户'
+    const avatarSrc = userInfo?.gender === '男' ? '/images/dor-man.png' : '/images/dor-weman.png'
     return(
         <Popover
-            // className="ant-popover_p-0"
-            overlayClassName="ant-popover_p-0"
+            classNames={{root: 'user-popover'}}
+            placement={'bottomRight'}
+            trigger={'click'}
             content={
                 <div className={'avatar-content'}>
                     {/* 主题头像 */}
@@ -20,7 +29,7 @@ export default ({
                         <div className={'avatar-img'}>
                             <Avatar
                                 size={64}
-                                src={userInfo?.gender === '男' ? '/images/dor-man.png' : '/images/dor-weman.png'}
+                                src={avatarSrc}
                                 icon={<UserOutlined/>}>
                             </Avatar>
                         </div>
@@ -29,22 +38,21 @@ export default ({
                                 {userInfo?.userName}
                             </div>
                             <div className={'info-rolename'}>
-                                {userInfo?.role === 'admin'? '管理员':'普通用户'}
+                                {roleLabel}
                             </div>
                         </div>
                     </div>
-                    <Divider style={{margin: '15px 0'}}/>
+                    <Divider style={{margin: '14px 0'}}/>
                     {/* 功能按钮 */}
-                    {/*<div className={'avatar-btn'}>*/}
-                        <Space direction="vertical" size="small" style={{display: 'flex'}}>
-                            <Button icon={<EditOutlined />} type={'primary'} onClick={onEditPassword} block>修改密码</Button>
-                            <Button icon={<LogoutOutlined/>} onClick={onLogout} block>退出登录</Button>
-                        </Space>
-                    {/*</div>*/}
+                    <Space direction="vertical" size="small" style={{display: 'flex'}}>
+                        <Button icon={<EditOutlined />} type={'primary'} onClick={onEditPassword} block>修改密码</Button>
+                        <Button icon={<LogoutOutlined/>} onClick={onLogout} block>退出登录</Button>
+                    </Space>
                 </div>
             }
-            trigger={'click'}>
-            <Avatar src={userInfo?.gender === '男' ? '/images/dor-man.png' : '/images/dor-weman.png'}></Avatar>
+        >
+            {/* 右上角头像: 保持系统默认样式, 不加额外样式 */}
+            <Avatar src={avatarSrc} icon={<UserOutlined/>}/>
         </Popover>
     )
 }
