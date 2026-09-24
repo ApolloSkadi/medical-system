@@ -13,6 +13,7 @@ import SaasPermission from '@/pages/system/saas/permission';
 import SaasDataSource from '@/pages/system/saas/dataSource';
 import {createClinicalPage} from "@/pages/system/clinical/ClinicalPage.jsx";
 import {ClinicalConfigs} from "@/pages/system/clinical/configs.js";
+import ClinicalReport from "@/pages/system/clinical/report/index.jsx";
 
 // SaaS临床业务页面(按文档第六章业务表生成，权限码控制)
 const ClinicalSubject = createClinicalPage(ClinicalConfigs.subject);
@@ -177,6 +178,16 @@ export default [{
                 icon: 'CalendarOutlined',
                 roles: ['admin', 'user', 'platform'],
                 permission: 'follow_up:view'
+            }
+        },
+        {
+            path: 'clinical/report',
+            element: <ClinicalReport/>,
+            meta: {
+                title: '综合报表',
+                icon: 'ProfileOutlined',
+                roles: ['admin', 'user', 'platform'],
+                permission: 'report:view'
             }
         },
         {

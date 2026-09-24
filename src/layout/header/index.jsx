@@ -5,7 +5,7 @@ import {useMenuStore} from "@/store/menu.js";
 import PwdChangeModal from "@/layout/header/components/PwdChangeModal/index.jsx";
 import {useMemo, useRef, useState} from "react";
 import {message} from "antd";
-import {CalendarOutlined, HomeOutlined} from "@ant-design/icons";
+import {CalendarOutlined} from "@ant-design/icons";
 import dayjs from "dayjs";
 import {EditUser} from "@/api/system/user/index.js";
 
@@ -40,10 +40,6 @@ export default () => {
                 <div className={'header-title'}>
                     <span className={'header-title-bar'}/>
                     {pageTitle}
-                </div>
-                <div className={'header-sub'}>
-                    <HomeOutlined/>
-                    SPIRR-PS-PA 临床试验数据平台
                 </div>
             </div>
 

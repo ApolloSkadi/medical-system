@@ -117,6 +117,7 @@
     // ===== 左侧品牌区 =====
     .login-brand {
         position: relative;
+        // 内容放大 2.5 倍后需要更宽的行宽, 否则品牌名/说明会折行
         flex: 0 0 46%;
         display: flex;
         flex-direction: column;
@@ -174,12 +175,12 @@
 
     // 品牌标记: SVG 心电图描边动画
     .brand-mark {
-        flex: 0 0 52px;
-        width: 52px;
-        height: 52px;
+        flex: 0 0 72px;
+        width: 72px;
+        height: 72px;
         display: grid;
         place-items: center;
-        border-radius: 16px;
+        border-radius: 20px;
         color: #fff;
         background: rgba(255, 255, 255, .16);
         border: 1px solid rgba(255, 255, 255, .3);
@@ -200,7 +201,7 @@
     }
 
     .brand-name {
-        font-size: 20px;
+        font-size: 26px;
         font-weight: 700;
         letter-spacing: .5px;
     }
@@ -227,6 +228,7 @@
     }
 
     .brand-features {
+        margin-top: 40px;
         margin: 40px 0 0;
         padding: 0;
         list-style: none;
@@ -495,7 +497,7 @@
     }
 }
 
-// 中屏: 品牌区收窄
+// 中屏: 品牌区收窄留白, 缩放比例回落一档
 @media (max-width: 1280px) {
     .login-page {
         .login-brand {

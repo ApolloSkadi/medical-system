@@ -19,6 +19,7 @@ import {
     MenuFoldOutlined,
     MenuUnfoldOutlined,
     MedicineBoxOutlined,
+    ProfileOutlined,
     RadarChartOutlined,
     ReconciliationOutlined,
     SolutionOutlined,
@@ -45,6 +46,7 @@ const iconMap = {
     FileTextOutlined: <FileTextOutlined/>,
     FileProtectOutlined: <FileProtectOutlined/>,
     CalendarOutlined: <CalendarOutlined/>,
+    ProfileOutlined: <ProfileOutlined/>,
 }
 
 export default () => {

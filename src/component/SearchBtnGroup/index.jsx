@@ -1,6 +1,6 @@
 import { Space, Button } from 'antd'
 import { useState } from 'react'
-import {PlusOutlined} from "@ant-design/icons";
+import {ExportOutlined, PlusOutlined} from "@ant-design/icons";
 
 export default ({ onSearch, onReset, onExport, onImport, onAdd,children }) => {
     const [searchLoading, setSearchLoading] = useState(false)
@@ -24,7 +24,7 @@ export default ({ onSearch, onReset, onExport, onImport, onAdd,children }) => {
             }
             {
                 onExport &&
-                <Button onClick={() => {
+                <Button icon={<ExportOutlined />} onClick={() => {
                     setExportLoading(true)
                     onExport().finally(() => setExportLoading(false))
                 }} loading={exportLoading}>导出</Button>

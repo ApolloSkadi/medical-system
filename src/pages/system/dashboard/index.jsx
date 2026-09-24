@@ -1,9 +1,10 @@
 import {useCallback, useEffect, useMemo, useState} from "react";
-import {Button, Card, Col, Empty, Progress, Row, Skeleton, Table, Tag, Tooltip} from "antd";
+import {Calendar, Button, Card, Col, Empty, Progress, Row, Skeleton, Table, Tag, Tooltip} from "antd";
 import {
     CalendarOutlined,
     DotChartOutlined,
     FileDoneOutlined,
+    LeftOutlined,
     RadarChartOutlined,
     ReloadOutlined,
     RightOutlined,
@@ -12,7 +13,7 @@ import {
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import {useNavigate} from "react-router-dom";
-import {DashboardStats} from "@/api/system/clinical/index.js";
+import {DashboardStats, DashboardCalendar} from "@/api/system/clinical/index.js";
 import useAuthStore from "@/store/useAuthStore.js";
 import {useCountUp, useReveal} from "./hooks.js";
 import "./index.scss";
@@ -20,6 +21,7 @@ import "./index.scss";
 // 随访状态(1待完成 2已完成 3逾期 4已取消)
 const FOLLOW_STATUS = {1: ['待完成', 'warning'], 2: ['已完成', 'success'], 3: ['逾期', 'error'], 4: ['已取消', 'default']};
 const FOLLOW_TYPE = {1: '超声', 2: 'CMR', 3: '门诊', 4: '其他'};
+const FOLLOW_STATUS_COLOR = {1: '#faad14', 2: '#52c41a', 3: '#ff4d4f', 4: '#ccc'};
 const ROLE_LABEL = {admin: '管理员', user: '普通用户', platform: '平台管理员'};
 
 const formatDate = value => {
@@ -163,6 +165,10 @@ export default () => {
     const permissions = useAuthStore(state => state.permissions);
     const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(true);
+    // 随访日历: 计划日期(YYYY-MM-DD) -> 当日任务列表
+    const [calendarTasks, setCalendarTasks] = useState({});
+    // 日历当前选中日期(默认今天), 下方展示当日全部随访详情
+    const [selectedDate, setSelectedDate] = useState(dayjs());
 
     const loadStats = useCallback(() => {
         setLoading(true);
@@ -174,12 +180,28 @@ export default () => {
 
     useEffect(() => {
         loadStats();
+        // 简化版随访日历: ±30天内的随访任务按计划日期分组
+        DashboardCalendar().then(res => {
+            const map = {};
+            (res?.data ?? []).forEach(item => {
+                if (!item?.planDate) return;
+                const key = String(item.planDate).slice(0, 10);
+                (map[key] = map[key] ?? []).push(item);
+            });
+            setCalendarTasks(map);
+        }).catch(() => {});
     }, [loadStats]);
 
     // 权限判断: 平台管理员与旧会话放行, 避免跳转被路由守卫拦截
     const can = useCallback(
         code => role === 'platform' || !permissions?.length || permissions.includes(code),
         [permissions, role]
+    );
+
+    // 选中日期当天的随访任务
+    const selectedTasks = useMemo(
+        () => calendarTasks[selectedDate.format('YYYY-MM-DD')] ?? [],
+        [calendarTasks, selectedDate],
     );
 
     // 快捷入口(按权限码过滤, 无权限则不展示)
@@ -358,9 +380,7 @@ export default () => {
                                     )}
                                 </Card>
                             </Reveal>
-                        </Col>
-                        <Col xs={24} xl={15}>
-                            <Reveal delay={100} className={'dash-reveal-fill'}>
+                            <Reveal delay={200}>
                                 <Card className="dash-card" variant="borderless" title="最近随访任务">
                                     <Table
                                         className="dash-table"
@@ -385,6 +405,90 @@ export default () => {
                                             ) : '可在随访任务中查看全部'}
                                         </div>
                                     )}
+                                </Card>
+                            </Reveal>
+                        </Col>
+                        <Col xs={24} xl={15}>
+                            <Reveal delay={100} className={'dash-reveal-fill'}>
+                                <Card className="dash-card" variant="borderless" title="随访日历"
+                                      styles={{body: {padding: '.4rem'}}}>
+                                    <Calendar
+                                        fullscreen={false}
+                                        value={selectedDate}
+                                        onSelect={setSelectedDate}
+                                        headerRender={({value}) => (
+                                            <div className="dash-cal-head">
+                                                <Button
+                                                    type="text"
+                                                    size="small"
+                                                    icon={<LeftOutlined/>}
+                                                    onClick={() => setSelectedDate(value.subtract(1, 'month'))}
+                                                />
+                                                <span className="dash-cal-title">{value.format('YYYY年MM月')}</span>
+                                                <Button
+                                                    type="text"
+                                                    size="small"
+                                                    icon={<RightOutlined/>}
+                                                    onClick={() => setSelectedDate(value.add(1, 'month'))}
+                                                />
+                                            </div>
+                                        )}
+                                        dateCellRender={value => {
+                                            const tasks = calendarTasks[value.format('YYYY-MM-DD')] ?? [];
+                                            if (!tasks.length) return null;
+                                            return (
+                                                <div style={{display: 'flex', flexDirection: 'column', gap: 2}}>
+                                                    {tasks.slice(0, 2).map((t, i) => (
+                                                        <Tooltip key={i} title={`${t.subjectName ?? '未关联'} · ${FOLLOW_TYPE[t.followupType] ?? '随访'} · ${FOLLOW_STATUS[t.status]?.[0] ?? ''}`}>
+                                                            <div style={{
+                                                                fontSize: 11, lineHeight: '1.3', padding: '1px 4px',
+                                                                borderRadius: 3, overflow: 'hidden', whiteSpace: 'nowrap',
+                                                                textOverflow: 'ellipsis', color: '#fff',
+                                                                background: FOLLOW_STATUS_COLOR[t.status] ?? '#999',
+                                                            }}>
+                                                                {t.subjectName ?? '未关联'} {FOLLOW_TYPE[t.followupType] ?? ''}
+                                                            </div>
+                                                        </Tooltip>
+                                                    ))}
+                                                    {tasks.length > 2 && (
+                                                        <div style={{fontSize: 10, color: '#999', paddingLeft: 2}}>共{tasks.length}项</div>
+                                                    )}
+                                                </div>
+                                            );
+                                        }}
+                                    />
+                                    {/* 选中日期当天的全部随访详情 */}
+                                    <div className="follow-detail">
+                                        <div className="follow-detail-head">
+                                            当日随访详情 · {selectedDate.format('YYYY-MM-DD')}
+                                            {selectedTasks.length > 0 && (
+                                                <span className="follow-detail-count">共 {selectedTasks.length} 项</span>
+                                            )}
+                                        </div>
+                                        {selectedTasks.length > 0 ? (
+                                            <div className="follow-detail-list">
+                                                {selectedTasks.map((t, i) => {
+                                                    const [statusLabel, statusColor] = FOLLOW_STATUS[t.status] ?? ['未知', 'default'];
+                                                    return (
+                                                        <div className="follow-detail-item" key={t.id ?? i}>
+                                                            <div className="follow-detail-item-head">
+                                                                <span className="follow-detail-subject">
+                                                                    {t.subjectName ?? '未关联研究对象'}
+                                                                </span>
+                                                                <Tag color={statusColor}>{statusLabel}</Tag>
+                                                            </div>
+                                                            <div className="follow-detail-item-body">
+                                                                <span>随访类型：{FOLLOW_TYPE[t.followupType] ?? '-'}</span>
+                                                                <span>计划日期：{formatDate(t.planDate)}</span>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        ) : (
+                                            <div className="follow-detail-empty">当前日期无随访</div>
+                                        )}
+                                    </div>
                                 </Card>
                             </Reveal>
                         </Col>

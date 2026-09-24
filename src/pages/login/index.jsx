@@ -15,9 +15,9 @@ import useAuthStore from "@/store/useAuthStore.js";
 
 // 左侧品牌区能力点(纯代码图形, 无图片资源)
 const FEATURES = [
-    {icon: <TeamOutlined/>, title: '研究对象管理', desc: '入组、基线信息与队列全程留痕'},
+    {icon: <TeamOutlined/>, title: '研究对象管理', desc: '入组、录入和导出'},
     {icon: <CalendarOutlined/>, title: '随访计划提醒', desc: '访视节点自动排期与状态跟踪'},
-    {icon: <RadarChartOutlined/>, title: '检查数据归档', desc: '超声 / CMR / 住院数据统一沉淀'},
+    {icon: <RadarChartOutlined/>, title: '检查数据管理', desc: '超声 / CMR / 住院数据等'},
 ];
 
 export default () => {
@@ -112,8 +112,6 @@ export default () => {
                             <div className={'brand-sub'}>SPIRR-PS-PA 临床试验</div>
                         </div>
                     </div>
-                    <h1 className={'brand-title'}>让每一次随访都<br/>有据可依</h1>
-                    <p className={'brand-desc'}>面向多中心的 PS / PA_IVS 临床数据平台，覆盖入组、随访、检查与统计分析全流程。</p>
                     <ul className={'brand-features'}>
                         {FEATURES.map((item, index) => (
                             <li key={item.title} style={{'--i': index}}>

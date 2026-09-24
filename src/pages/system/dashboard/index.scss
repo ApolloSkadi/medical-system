@@ -614,6 +614,94 @@
         }
     }
 
+    // ===== 随访日历头部与当日详情 =====
+    .dash-cal-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: .2rem .4rem;
+    }
+
+    .dash-cal-title {
+        font-weight: 600;
+        font-size: 13px;
+    }
+
+    .follow-detail {
+        margin-top: .4rem;
+        padding: .6rem .8rem .8rem;
+        border-top: 1px dashed rgba(0, 0, 0, .07);
+    }
+
+    .follow-detail-head {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        margin-bottom: .6rem;
+        font-size: 13px;
+        font-weight: 600;
+        color: #1f2d3d;
+    }
+
+    .follow-detail-count {
+        font-size: 12px;
+        font-weight: 400;
+        color: #8593a6;
+    }
+
+    .follow-detail-list {
+        display: flex;
+        flex-direction: column;
+        gap: .5rem;
+        max-height: 16rem;
+        overflow-y: auto;
+    }
+
+    .follow-detail-item {
+        padding: .5rem .7rem;
+        border: 1px solid rgba(0, 0, 0, .06);
+        border-radius: 8px;
+        background: rgba(140, 140, 140, .04);
+        transition: box-shadow .25s ease, transform .25s ease;
+
+        &:hover {
+            box-shadow: 0 4px 14px rgba(31, 45, 61, .08);
+            transform: translateY(-1px);
+        }
+    }
+
+    .follow-detail-item-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: .5rem;
+        margin-bottom: .25rem;
+    }
+
+    .follow-detail-subject {
+        font-size: 13px;
+        font-weight: 600;
+        color: #1f2d3d;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    .follow-detail-item-body {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .3rem 1.2rem;
+        font-size: 12px;
+        color: #5b6b7f;
+    }
+
+    .follow-detail-empty {
+        padding: 1rem 0;
+        text-align: center;
+        font-size: 12.5px;
+        color: #9aa5b4;
+    }
+
     // ===== 骨架屏 =====
     .dash-skeleton {
         display: flex;

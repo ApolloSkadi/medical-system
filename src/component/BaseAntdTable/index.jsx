@@ -23,13 +23,16 @@ export default forwardRef(
         const [total, setTotal] = useState(0);
         const [loading, setLoading] = useState(false);
         const [tableData, setTableData] = useState([]);
+        // 服务端排序状态: {orderBy, orderType} 随分页请求带给后端, 保证整体数据有序而非仅当前页
+        const [serverSort, setServerSort] = useState({});
         let isMounted = true;
 
         const getTableData = ({
             page = current,
             limit = pageSize,
             data = apiData,
-            otherData = {}
+            otherData = {},
+            sort = serverSort
         } = {}) => {
             if (valid && !valid()) return;
             setLoading(true);
@@ -43,6 +46,7 @@ export default forwardRef(
                 pageSearch: {
                     limit,
                     page,
+                    ...sort,
                 },
                 ...Object.assign({}, data, otherData),
             }).then(res => {
@@ -103,12 +107,29 @@ export default forwardRef(
             otherData,
         })
         // 重置查询（还原页数和条数和空查询）
-        const resetPageSearch = otherData => getTableData({
-            page: initCurrent,
-            limit: initPageSize,
-            data: {},
-            otherData,
-        })
+        const resetPageSearch = otherData => {
+            setServerSort({});
+            return getTableData({
+                page: initCurrent,
+                limit: initPageSize,
+                data: {},
+                otherData,
+                sort: {},
+            })
+        }
+
+        // 表格变更(排序/筛选/翻页统一入口): 仅排序变化时回到第一页重新拉取整体有序数据,
+        // 翻页仍由分页器的 onChange 处理, 避免重复请求
+        const sortKey = sort => sort?.orderBy ? `${sort.orderBy}_${sort.orderType}` : '';
+        const handleTableChange = (_pagination, _filters, sorter) => {
+            args.onChange?.(_pagination, _filters, sorter);
+            const nextSort = sorter?.order
+                ? {orderBy: sorter.field ?? sorter.columnKey, orderType: sorter.order === 'ascend' ? 'asc' : 'desc'}
+                : {};
+            if (sortKey(nextSort) === sortKey(serverSort)) return;
+            setServerSort(nextSort);
+            getTableData({page: initCurrent, limit: pageSize, sort: nextSort});
+        };
 
         useImperativeHandle(
             ref,
@@ -119,7 +140,7 @@ export default forwardRef(
                     resetPageSearch,
                 };
             },
-            [current, pageSize, apiData],
+            [current, pageSize, apiData, serverSort],
         );
         useEffect(() => {
             autoInit && getTableData();
@@ -147,6 +168,7 @@ export default forwardRef(
                 }}
                 dataSource={tableData}
                 {...args}
+                onChange={handleTableChange}
             />
     },
 );

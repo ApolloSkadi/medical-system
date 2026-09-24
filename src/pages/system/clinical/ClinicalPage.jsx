@@ -1,7 +1,7 @@
 import {useEffect, useMemo, useRef, useState} from "react";
 import {Button, Col, DatePicker, Form, Input, InputNumber, message, Modal, Row, Upload} from "antd";
 import {FAntdInput} from "izid";
-import {DownloadOutlined, FileOutlined, UploadOutlined} from "@ant-design/icons";
+import {FileOutlined, FileExcelOutlined, ImportOutlined, UploadOutlined} from "@ant-design/icons";
 import dayjs from "dayjs";
 import useAuthStore from "@/store/useAuthStore.js";
 import SearchRow from "@/component/SearchRow/index.jsx";
@@ -14,12 +14,75 @@ import BasePopconfirm from "@/component/BasePopconfirm/index.jsx";
 import TableActionButtons from "@/component/TableActionButtons/index.jsx";
 import {hasPermission} from "@/utils/permission.js";
 import {easyNotNull} from "@/utils/antd-validator.js";
-import {SubjectList, ClinicalFileListByBiz, ClinicalFileUpload, ClinicalFileDelete, ClinicalFileDownload, ClinicalImport, ClinicalImportTemplate} from "@/api/system/clinical/index.js";
+import {SubjectList, ClinicalFileListByBiz, ClinicalFileUpload, ClinicalFileDelete, ClinicalFileDownload, ClinicalImport, ClinicalImportTemplate, ClinicalExport} from "@/api/system/clinical/index.js";
 import {TenantList, UserRoleUserList} from "@/api/system/saas/index.js";
 
 const DATE_FMT = 'YYYY-MM-DD';
 const DATETIME_FMT = 'YYYY-MM-DD HH:mm:ss';
 const BOOL_OPTIONS = [{label: '是', value: 1}, {label: '否', value: 0}];
+
+// 触发浏览器下载(blob流直接使用, 勿再包一层Blob)
+const downloadBlob = (blob, fileName) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    a.click();
+    URL.revokeObjectURL(url);
+};
+
+// 机械通气多组编辑器: 动态增删行, 小时留空由后端按起止自动计算
+function VentilationsEditor({value, onChange}) {
+    const rows = Array.isArray(value) ? value : [];
+    const computedHours = r => {
+        if (!r?.startTime || !r?.endTime) return null;
+        const start = dayjs(r.startTime);
+        const end = dayjs(r.endTime);
+        if (!start.isValid() || !end.isValid() || !end.isAfter(start)) return null;
+        return Math.round(end.diff(start) / 360000.0) / 10.0;
+    };
+    // 更新一行: 起止时间齐时自动计算小时并写入值
+    const update = (i, patch) => {
+        const merged = {...rows[i], ...patch};
+        merged.hours = computedHours(merged);
+        onChange?.(rows.map((r, idx) => (idx === i ? merged : r)));
+    };
+    const totalHours = rows.reduce((sum, r) => sum + (computedHours(r) ?? 0), 0);
+    return (
+        <div style={{width: '100%'}}>
+            {rows.map((r, i) => (
+                <Row gutter={8} key={i} style={{marginBottom: '.4rem'}} align="middle">
+                    <Col span={10}>
+                        <DatePicker showTime style={{width: '100%'}} placeholder="机械通气开始时间"
+                                    value={r.startTime ? dayjs(r.startTime) : null}
+                                    onChange={t => update(i, {startTime: t})}/>
+                    </Col>
+                    <Col span={10}>
+                        <DatePicker showTime style={{width: '100%'}} placeholder="机械通气结束时间"
+                                    value={r.endTime ? dayjs(r.endTime) : null}
+                                    onChange={t => update(i, {endTime: t})}/>
+                    </Col>
+                    <Col span={2}>
+                        <span style={{fontSize: 12, color: '#999', whiteSpace: 'nowrap'}}>
+                            {computedHours(r) !== null ? `${computedHours(r)}h` : '自动'}
+                        </span>
+                    </Col>
+                    <Col span={2}>
+                        <Button size={'small'} type={'link'} danger
+                                onClick={() => onChange?.(rows.filter((_, idx) => idx !== i))}>删</Button>
+                    </Col>
+                </Row>
+            ))}
+            <Button size={'small'} type={'dashed'}
+                    onClick={() => onChange?.([...rows, {}])}>+ 添加一组机械通气</Button>
+            {rows.length > 0 && (
+                <div style={{fontSize: 12, color: '#52c41a', marginTop: '.3rem'}}>
+                    合计 {Math.round(totalHours * 10) / 10} 小时（保存后写入总小时数）
+                </div>
+            )}
+        </div>
+    );
+}
 
 // 业务附件面板: 上传/下载/删除(后端按租户隔离)
 function AttachmentPanel({bizType, bizId, files, onReload}) {
@@ -88,7 +151,6 @@ export const createClinicalPage = (config) => {
         const canEdit = hasPermission(`${config.module}:edit`);
         const canDelete = hasPermission(`${config.module}:delete`);
 
-        const [searchSubjectId, setSearchSubjectId] = useState(undefined);
         const [searchTenantId, setSearchTenantId] = useState(undefined);
         const [extraSearch, setExtraSearch] = useState({});
         // 研究对象/负责人等动态选项
@@ -137,6 +199,7 @@ export const createClinicalPage = (config) => {
                 return hit ? hit.label : value;
             }
             if (field?.type === 'date') return String(value).slice(0, 10);
+            if (field?.type === 'datetime') return String(value).slice(0, 19).replace('T', ' ');
             return String(value);
         };
 
@@ -145,15 +208,21 @@ export const createClinicalPage = (config) => {
                 title: '研究对象',
                 dataIndex: 'subjectId',
                 key: 'subjectId',
+                // 研究对象姓名在另一张表, 主表只有subjectId(无业务含义), 不参与排序
                 render: value => subjectMap[value]?.name ?? (value ? `${String(value).slice(0, 12)}...` : '-'),
             }] : []),
-            ...config.columns.map(name => ({
-                title: fieldMap[name]?.label ?? name,
-                dataIndex: name,
-                key: name,
-                render: value => renderCell(fieldMap[name], value),
-            })),
-            {title: '创建时间', dataIndex: 'createDate', key: 'createDate'},
+            ...config.columns.map(col => {
+                const name = typeof col === 'string' ? col : col.name;
+                const label = typeof col === 'string' ? (fieldMap[name]?.label ?? name) : col.label;
+                return {
+                    title: label,
+                    dataIndex: name,
+                    key: name,
+                    // 服务端排序: 整体数据按列名正序/倒序(后端按白名单映射到实体列)
+                    sorter: true,
+                    render: value => renderCell(fieldMap[name], value),
+                };
+            }),
             {
                 title: '操作',
                 dataIndex: 'action',
@@ -169,7 +238,6 @@ export const createClinicalPage = (config) => {
 
         const onSearch = () => tableRef.current?.initPageSearch();
         const onReset = () => {
-            setSearchSubjectId(undefined);
             setSearchTenantId(undefined);
             setExtraSearch({});
             return tableRef.current?.resetPageSearch();
@@ -213,6 +281,15 @@ export const createClinicalPage = (config) => {
             config.fields.forEach(f => {
                 if (f.type === 'date') payload[f.name] = data[f.name] ? data[f.name].format(DATE_FMT) : undefined;
                 if (f.type === 'datetime') payload[f.name] = data[f.name] ? data[f.name].format(DATETIME_FMT) : undefined;
+                if (f.type === 'ventilations' && Array.isArray(data[f.name])) {
+                    payload[f.name] = data[f.name]
+                        .filter(v => v.startTime || v.endTime)
+                        .map(v => ({
+                            startTime: v.startTime ? dayjs(v.startTime).format(DATETIME_FMT) : undefined,
+                            endTime: v.endTime ? dayjs(v.endTime).format(DATETIME_FMT) : undefined,
+                            hours: v.hours ?? null,
+                        }));
+                }
             });
             return config.api.SaveOrEdit(payload).then(res => {
                 message.success(res.data);
@@ -235,6 +312,8 @@ export const createClinicalPage = (config) => {
                     return <DatePicker showTime style={{width: '100%'}}/>;
                 case 'textarea':
                     return <Input.TextArea rows={2}/>;
+                case 'ventilations':
+                    return <VentilationsEditor/>;
                 default:
                     return <FAntdInput/>;
             }
@@ -270,34 +349,31 @@ export const createClinicalPage = (config) => {
         // 下载导入模板
         const downloadTemplate = () => {
             ClinicalImportTemplate({bizType: config.key}).then(blob => {
-                // 文件流响应: 直接使用返回的blob(勿再包一层, 否则内容会变成[object Object])
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${config.title}导入模板.xlsx`;
-                a.click();
-                URL.revokeObjectURL(url);
+                downloadBlob(blob, `${config.title}导入模板.xlsx`);
+            });
+        };
+        // 按当前筛选导出数据(结构与导入模板一致, 可直接再导入)
+        const doExport = () => {
+            return ClinicalExport({
+                bizType: config.key,
+                tenantId: searchTenantId,
+                ...extraSearch,
+            }).then(blob => {
+                downloadBlob(blob, `${config.title}导出_${dayjs().format('YYYYMMDD_HHmm')}.xlsx`);
             });
         };
 
         const renderSearchControl = (item) => {
-            if (item.type === 'select') return <BaseAntdSelect data={item.options}/>;
+            // 下拉框与输入框宽度保持一致(输入框默认 minWidth 15rem); 选中值需绑定进extraSearch才参与查询
+            if (item.type === 'select') return <BaseAntdSelect data={item.options} style={{width: '15rem'}}
+                                                               value={extraSearch[item.name]}
+                                                               setValue={value => setExtraSearch({...extraSearch, [item.name]: value})}/>;
             return <BaseAntdInput value={extraSearch[item.name]} setValue={value => setExtraSearch({...extraSearch, [item.name]: value})}/>;
         };
 
         return (
             <>
                 <SearchRow>
-                    {config.subjectBased && (
-                        <SearchRow.Item title={'研究对象'}>
-                            <BaseAntdSelect
-                                value={searchSubjectId}
-                                setValue={setSearchSubjectId}
-                                style={{width: '16rem'}}
-                                data={subjectOptions}
-                            />
-                        </SearchRow.Item>
-                    )}
                     {isPlatform && (
                         <SearchRow.Item title={'租户'}>
                             <BaseAntdSelect
@@ -320,19 +396,19 @@ export const createClinicalPage = (config) => {
                             onSearch={onSearch}
                             onReset={onReset}
                             onAdd={canCreate ? openModal : undefined}
+                            onExport={doExport}
                         >
                             <Upload accept=".xlsx,.xls" showUploadList={false}
                                     beforeUpload={file => { doImport(file); return false; }}>
-                                <Button icon={<UploadOutlined/>} disabled={!canCreate}>导入</Button>
+                                <Button icon={<ImportOutlined/>} disabled={!canCreate}>导入</Button>
                             </Upload>
-                            <Button icon={<DownloadOutlined/>} onClick={downloadTemplate}>模板</Button>
+                            <Button icon={<FileExcelOutlined/>} onClick={downloadTemplate}>模板</Button>
                         </SearchBtnGroup>
                     </SearchRow.Item>
                 </SearchRow>
                 <BaseAntdTable
                     api={config.api.Page}
                     apiData={{
-                        subjectId: searchSubjectId,
                         tenantId: searchTenantId,
                         ...extraSearch,
                     }}

@@ -58,5 +58,14 @@ export const ClinicalImportTemplate = data => ClinicalInstance.post(
     {responseType: 'blob', timeout: 60000}
 );
 
+// ==================== 综合报表 ====================
+export const ClinicalReportQuery = data => ClinicalInstance.post('/report/query', data);
+
 // ==================== 首页看板 ====================
 export const DashboardStats = data => ClinicalInstance.post('/dashboard/stats', data);
+
+// ==================== 看板随访日历(±30天) ====================
+export const DashboardCalendar = data => ClinicalInstance.post('/dashboard/calendar', data);
+
+// ==================== 按导入模板结构导出业务数据 ====================
+export const ClinicalExport = data => ClinicalInstance.post('/import/export', data, {responseType: 'blob', timeout: 120000});
