@@ -195,6 +195,7 @@ export default Object.freeze({
         { label: '药物暴露', value: 'drug' },
         { label: '住院过程', value: 'hospitalization' },
         { label: '术后护理', value: 'nursing' },
+        { label: '随访提醒', value: 'follow_reminder' },
         { label: '用户管理', value: 'user_manage' },
     ],
     RoleTypeOptions:[

@@ -2,6 +2,7 @@ import {useEffect, useMemo, useRef, useState} from "react";
 import {Button, Col, DatePicker, Form, Input, InputNumber, message, Modal, Row, Upload} from "antd";
 import {FAntdInput} from "izid";
 import {FileOutlined, FileExcelOutlined, ImportOutlined, UploadOutlined} from "@ant-design/icons";
+import {useLocation, useNavigate} from "react-router-dom";
 import dayjs from "dayjs";
 import useAuthStore from "@/store/useAuthStore.js";
 import SearchRow from "@/component/SearchRow/index.jsx";
@@ -14,11 +15,13 @@ import BasePopconfirm from "@/component/BasePopconfirm/index.jsx";
 import TableActionButtons from "@/component/TableActionButtons/index.jsx";
 import {hasPermission} from "@/utils/permission.js";
 import {easyNotNull} from "@/utils/antd-validator.js";
-import {SubjectList, ClinicalFileListByBiz, ClinicalFileUpload, ClinicalFileDelete, ClinicalFileDownload, ClinicalImport, ClinicalImportTemplate, ClinicalExport} from "@/api/system/clinical/index.js";
-import {TenantList, UserRoleUserList} from "@/api/system/saas/index.js";
+import {SubjectList, ClinicalFileListByBiz, ClinicalFileUpload, ClinicalFileDelete, ClinicalFileDownload, ClinicalImport, ClinicalImportTemplate, ClinicalExport, ClinicalUserList} from "@/api/system/clinical/index.js";
+import {TenantList} from "@/api/system/saas/index.js";
 
 const DATE_FMT = 'YYYY-MM-DD';
 const DATETIME_FMT = 'YYYY-MM-DD HH:mm:ss';
+// 分钟精度时间(护理记录时间/药物开始结束时间等)
+const DATETIME_MINUTE_FMT = 'YYYY-MM-DD HH:mm';
 const BOOL_OPTIONS = [{label: '是', value: 1}, {label: '否', value: 0}];
 
 // 触发浏览器下载(blob流直接使用, 勿再包一层Blob)
@@ -82,6 +85,29 @@ function VentilationsEditor({value, onChange}) {
             )}
         </div>
     );
+}
+
+// 自动补算数字输入: 依赖字段(如术后RV收缩压/术后肺动脉收缩压)齐全且本字段为空时填充,
+// 不覆盖手工填写的值, 依赖不全时也不清空
+function AutoFillNumberInput({name, watch = [], setFormData, value, onChange}) {
+    const form = Form.useFormInstance();
+    const selfValue = Form.useWatch(name, form);
+    const firstValue = Form.useWatch(watch[0] ?? '__auto_fill_unused_0__', form);
+    const secondValue = Form.useWatch(watch[1] ?? '__auto_fill_unused_1__', form);
+
+    const isBlank = v => v === undefined || v === null || v === '';
+    useEffect(() => {
+        if (watch.length < 2 || !isBlank(selfValue) || isBlank(firstValue) || isBlank(secondValue)) {
+            return;
+        }
+        const result = Math.round((Number(firstValue) - Number(secondValue)) * 100) / 100;
+        if (Number.isFinite(result)) {
+            form.setFieldValue(name, result);
+            setFormData?.(data => ({...data, [name]: result}));
+        }
+    }, [firstValue, form, name, secondValue, selfValue, setFormData, watch.length]);
+
+    return <InputNumber style={{width: '100%'}} value={value} onChange={onChange}/>;
 }
 
 // 业务附件面板: 上传/下载/删除(后端按租户隔离)
@@ -152,7 +178,19 @@ export const createClinicalPage = (config) => {
         const canDelete = hasPermission(`${config.module}:delete`);
 
         const [searchTenantId, setSearchTenantId] = useState(undefined);
-        const [extraSearch, setExtraSearch] = useState({});
+        // URL参数预填搜索条件(随访任务关联编号跳转: /clinical/echo?recordNo=xxx 会触发对应记录查询展示)
+        const location = useLocation();
+        const navigate = useNavigate();
+        const initialExtraSearch = useMemo(() => {
+            const params = new URLSearchParams(location.search);
+            const initial = {};
+            config.search.forEach(item => {
+                const value = params.get(item.name);
+                if (value) initial[item.name] = value;
+            });
+            return initial;
+        }, []);
+        const [extraSearch, setExtraSearch] = useState(initialExtraSearch);
         // 研究对象/负责人等动态选项
         const [subjectOptions, setSubjectOptions] = useState([]);
         const [userOptions, setUserOptions] = useState([]);
@@ -169,7 +207,7 @@ export const createClinicalPage = (config) => {
                 });
             }
             if (config.fields.some(f => f.optionsApi === 'userList')) {
-                UserRoleUserList().then(res => {
+                ClinicalUserList().then(res => {
                     setUserOptions((res.data ?? []).map(u => ({
                         label: u.realName ? `${u.realName}（${u.userName}）` : u.userName,
                         value: u.id,
@@ -199,7 +237,7 @@ export const createClinicalPage = (config) => {
                 return hit ? hit.label : value;
             }
             if (field?.type === 'date') return String(value).slice(0, 10);
-            if (field?.type === 'datetime') return String(value).slice(0, 19).replace('T', ' ');
+            if (field?.type === 'datetime') return String(value).slice(0, 16).replace('T', ' ');
             return String(value);
         };
 
@@ -220,7 +258,14 @@ export const createClinicalPage = (config) => {
                     key: name,
                     // 服务端排序: 整体数据按列名正序/倒序(后端按白名单映射到实体列)
                     sorter: true,
-                    render: value => renderCell(fieldMap[name], value),
+                    render: value => {
+                        const field = fieldMap[name];
+                        // 关联编号列: 点击跳转对应页面并按记录编号触发查询展示
+                        if (field?.linkPage && value !== undefined && value !== null && value !== '') {
+                            return <a onClick={() => navigate(`${field.linkPage}?${field.linkParam ?? 'recordNo'}=${encodeURIComponent(value)}`)}>{renderCell(field, value)}</a>;
+                        }
+                        return renderCell(field, value);
+                    },
                 };
             }),
             {
@@ -269,7 +314,7 @@ export const createClinicalPage = (config) => {
             config.fields.forEach(f => {
                 let value = data[f.name];
                 if ((f.type === 'date' || f.type === 'datetime') && value) {
-                    value = dayjs(String(value).slice(0, f.type === 'date' ? 10 : 19));
+                    value = dayjs(String(value).slice(0, f.type === 'date' ? 10 : 16));
                 }
                 values[f.name] = value !== undefined && value !== null ? value : (f.type === 'bool' ? 0 : undefined);
             });
@@ -280,7 +325,8 @@ export const createClinicalPage = (config) => {
             const payload = {...data};
             config.fields.forEach(f => {
                 if (f.type === 'date') payload[f.name] = data[f.name] ? data[f.name].format(DATE_FMT) : undefined;
-                if (f.type === 'datetime') payload[f.name] = data[f.name] ? data[f.name].format(DATETIME_FMT) : undefined;
+                // 分钟精度: 护理记录时间/药物开始结束时间等到分钟
+                if (f.type === 'datetime') payload[f.name] = data[f.name] ? data[f.name].format(DATETIME_MINUTE_FMT) : undefined;
                 if (f.type === 'ventilations' && Array.isArray(data[f.name])) {
                     payload[f.name] = data[f.name]
                         .filter(v => v.startTime || v.endTime)
@@ -301,6 +347,9 @@ export const createClinicalPage = (config) => {
         const renderControl = (field) => {
             switch (field.type) {
                 case 'number':
+                    if (Array.isArray(field.autoCalc)) {
+                        return <AutoFillNumberInput name={field.name} watch={field.autoCalc} setFormData={setFormData}/>;
+                    }
                     return <InputNumber style={{width: '100%'}}/>;
                 case 'select':
                     return <BaseAntdSelect data={resolveOptions(field)}/>;
@@ -309,7 +358,7 @@ export const createClinicalPage = (config) => {
                 case 'date':
                     return <DatePicker style={{width: '100%'}}/>;
                 case 'datetime':
-                    return <DatePicker showTime style={{width: '100%'}}/>;
+                    return <DatePicker showTime={{format: 'HH:mm'}} format="YYYY-MM-DD HH:mm" style={{width: '100%'}}/>;
                 case 'textarea':
                     return <Input.TextArea rows={2}/>;
                 case 'ventilations':

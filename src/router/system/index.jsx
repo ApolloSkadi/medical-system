@@ -14,6 +14,7 @@ import SaasDataSource from '@/pages/system/saas/dataSource';
 import {createClinicalPage} from "@/pages/system/clinical/ClinicalPage.jsx";
 import {ClinicalConfigs} from "@/pages/system/clinical/configs.js";
 import ClinicalReport from "@/pages/system/clinical/report/index.jsx";
+import ClinicalRemind from "@/pages/system/clinical/remind/index.jsx";
 
 // SaaS临床业务页面(按文档第六章业务表生成，权限码控制)
 const ClinicalSubject = createClinicalPage(ClinicalConfigs.subject);
@@ -188,6 +189,16 @@ export default [{
                 icon: 'ProfileOutlined',
                 roles: ['admin', 'user', 'platform'],
                 permission: 'report:view'
+            }
+        },
+        {
+            path: 'clinical/remind',
+            element: <ClinicalRemind/>,
+            meta: {
+                title: '随访提醒',
+                icon: 'BellOutlined',
+                roles: ['admin', 'user', 'platform'],
+                permission: 'follow_reminder:view'
             }
         },
         {

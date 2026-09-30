@@ -20,7 +20,7 @@ import "./index.scss";
 
 // 随访状态(1待完成 2已完成 3逾期 4已取消)
 const FOLLOW_STATUS = {1: ['待完成', 'warning'], 2: ['已完成', 'success'], 3: ['逾期', 'error'], 4: ['已取消', 'default']};
-const FOLLOW_TYPE = {1: '超声', 2: 'CMR', 3: '门诊', 4: '其他'};
+const FOLLOW_TYPE = {1: '访视一', 2: '访视二', 3: '访视三', 4: '其他'};
 const FOLLOW_STATUS_COLOR = {1: '#faad14', 2: '#52c41a', 3: '#ff4d4f', 4: '#ccc'};
 const ROLE_LABEL = {admin: '管理员', user: '普通用户', platform: '平台管理员'};
 
@@ -103,7 +103,7 @@ const DiagnosisRing = ({psCount = 0, paCount = 0}) => {
             <ul className="dash-ring-legend">
                 <li>
                     <span className="legend-dot" style={{'--accent': '#2db7f5'}}/>
-                    <span className="legend-label">PS 大动脉狭窄</span>
+                    <span className="legend-label">PS 肺动脉狭窄</span>
                     <span className="legend-value">{psCount}</span>
                 </li>
                 <li>
@@ -178,10 +178,9 @@ export default () => {
             .finally(() => setLoading(false));
     }, []);
 
-    useEffect(() => {
-        loadStats();
-        // 简化版随访日历: ±30天内的随访任务按计划日期分组
-        DashboardCalendar().then(res => {
+    // 随访日历查询: 以centerDate为中心前后一个月(点击日期/切换月份时重新触发)
+    const loadCalendar = useCallback(centerDate => {
+        return DashboardCalendar({date: (centerDate ?? dayjs()).format('YYYY-MM-DD')}).then(res => {
             const map = {};
             (res?.data ?? []).forEach(item => {
                 if (!item?.planDate) return;
@@ -190,7 +189,12 @@ export default () => {
             });
             setCalendarTasks(map);
         }).catch(() => {});
-    }, [loadStats]);
+    }, []);
+
+    useEffect(() => {
+        loadStats();
+        loadCalendar();
+    }, [loadStats, loadCalendar]);
 
     // 权限判断: 平台管理员与旧会话放行, 避免跳转被路由守卫拦截
     const can = useCallback(
@@ -415,21 +419,33 @@ export default () => {
                                     <Calendar
                                         fullscreen={false}
                                         value={selectedDate}
-                                        onSelect={setSelectedDate}
+                                        onSelect={date => {
+                                            setSelectedDate(date);
+                                            // 点击日期: 重新触发以该日期为中心前后一个月的随访查询
+                                            loadCalendar(date);
+                                        }}
                                         headerRender={({value}) => (
                                             <div className="dash-cal-head">
                                                 <Button
                                                     type="text"
                                                     size="small"
                                                     icon={<LeftOutlined/>}
-                                                    onClick={() => setSelectedDate(value.subtract(1, 'month'))}
+                                                    onClick={() => {
+                                                        const prev = value.subtract(1, 'month');
+                                                        setSelectedDate(prev);
+                                                        loadCalendar(prev);
+                                                    }}
                                                 />
                                                 <span className="dash-cal-title">{value.format('YYYY年MM月')}</span>
                                                 <Button
                                                     type="text"
                                                     size="small"
                                                     icon={<RightOutlined/>}
-                                                    onClick={() => setSelectedDate(value.add(1, 'month'))}
+                                                    onClick={() => {
+                                                        const next = value.add(1, 'month');
+                                                        setSelectedDate(next);
+                                                        loadCalendar(next);
+                                                    }}
                                                 />
                                             </div>
                                         )}

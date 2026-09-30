@@ -14,7 +14,8 @@ export const baseBeforeFilter = req => {
     console.log('接口执行 req', req)
     return req;
 }
-// 通用响应拦截器
+
+// 通用响应拦截器(成功路径)
 export const baseAfterFilter = (resp => {
     const errorPromise = baseErrorHandle({
         response: resp
@@ -25,19 +26,34 @@ export const baseAfterFilter = (resp => {
     return resp.data;
 })
 
+// 登录过期统一处理
+const redirectToLogin = () => {
+    message.config({maxCount: 1});
+    message.error('登录过期，请重新登录', 1, () => {
+        localStorage.removeItem("autoLogin")
+        window.location.href = '/login';
+    })
+    return Promise.reject('登录过期')
+}
+
 // 是否文件流(导出/模板下载)响应
 const isBlobData = data => typeof Blob !== 'undefined' && data instanceof Blob;
 
 // 系统接口响应拦截器
-
-export const baseErrorHandle = ({code, message: respMsg, response: resp}) => {
-    // 构建错误返回
+// 统一错误处理: 兼容两种入参
+// 1. 响应成功路径(baseAfterFilter)传 {response: resp}: HTTP 200 但业务code非成功的响应体校验
+// 2. axios失败路径传 axios error 对象(HTTP 404/500、网络中断等):
+//    此类错误若不拦截会被当作成功响应放行(res.data为undefined), 页面上接口报错无任何提醒
+export const baseErrorHandle = (error) => {
     const createErrorReturn = _msg => Promise.reject(_msg ?? '操作失败').catch(err => {
         message.error(err)
         return Promise.reject(err)
     })
+    const code = error?.code;
+    const errMsg = error?.message;
+    const resp = error?.response;
     // 请求超时异常
-    if (code === 'ECONNABORTED' || respMsg === 'Network Error' || respMsg?.includes('timeout')) return createErrorReturn('网络请求超时');
+    if (code === 'ECONNABORTED' || errMsg === 'Network Error' || (errMsg || '').includes('timeout')) return createErrorReturn('网络请求超时');
     // 文件流响应: 正常文件直接放行(由响应拦截器返回blob本体);
     // 后端异常时会以json返回错误信息, 需要读取文本后提示, 避免把错误信息当成文件下载
     if (isBlobData(resp?.data)) {
@@ -54,18 +70,20 @@ export const baseErrorHandle = ({code, message: respMsg, response: resp}) => {
             return createErrorReturn(failMsg);
         });
     }
+    // axios请求失败(HTTP 404/500等非2xx或网络中断): 从原始错误响应中提取提示信息
+    if (error?.isAxiosError) {
+        if (resp?.status === 401 || resp?.data?.code === 'UNLOGIN') {
+            return redirectToLogin();
+        }
+        return createErrorReturn(resp?.data?.msg || resp?.data?.message || `请求失败(${resp?.status ?? '网络异常'})`);
+    }
     // 处理正确响应内容
     console.log('resp', resp)
-    if (!resp.data.code) return resp
+    if (!resp?.data?.code) return resp
     const apiRespData = resp.data;
     // token 过期处理
     if (apiRespData.code === 'UNLOGIN') {
-        message.config({maxCount: 1});
-        message.error('登录过期，请重新登录', 1, () => {
-            localStorage.removeItem("autoLogin")
-            window.location.href = '/login';
-        })
-        return Promise.reject(apiRespData.msg)
+        return redirectToLogin();
     }
     // 其他错误
     if (apiRespData.code !== 'OK' && apiRespData.code !== 200 && apiRespData.code !== '200') return createErrorReturn(apiRespData.msg)

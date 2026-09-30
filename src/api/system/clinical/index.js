@@ -69,3 +69,19 @@ export const DashboardCalendar = data => ClinicalInstance.post('/dashboard/calen
 
 // ==================== 按导入模板结构导出业务数据 ====================
 export const ClinicalExport = data => ClinicalInstance.post('/import/export', data, {responseType: 'blob', timeout: 120000});
+
+// ==================== 随访提醒 ====================
+export const RemindConfigPage = data => ClinicalInstance.post('/remind/page', data);
+
+export const RemindConfigSaveOrEdit = data => ClinicalInstance.post('/remind/saveOrEdit', data);
+
+export const RemindConfigDel = data => ClinicalInstance.post('/remind/delete', data);
+
+export const RemindConfigTest = data => ClinicalInstance.post('/remind/test', data);
+
+export const RemindJobTrigger = data => ClinicalInstance.post('/remind/jobTrigger', data);
+
+// ==================== 公共下拉数据 ====================
+// 用户下拉(随访负责人等): 普通租户用户可调, 走临床RBAC权限码(任一满足即可);
+// 勿改调 /system/saas/userRole/userList, 该接口在SaasPlatformInterceptor拦截范围内仅管理员可用
+export const ClinicalUserList = data => ClinicalInstance.post('/common/userList', data);
