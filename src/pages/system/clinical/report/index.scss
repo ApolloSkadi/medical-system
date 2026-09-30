@@ -1,0 +1,182 @@
+// 综合报表页样式(设计规范参考 jimubi-dashboard skill:
+// 白底卡片 / 深灰标题 #464646 / 浅灰轴标签 #909198 / 浅灰网格 #F3F3F3 / 首行4个KPI指标卡)
+.report-page {
+  padding: 1rem;
+  background: #f5f7fa;
+  min-height: 100%;
+
+  .report-card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 1px 4px rgba(31, 45, 61, 0.08);
+    padding: 1rem 1.2rem;
+    margin-bottom: 1rem;
+  }
+
+  .report-card-title {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    font-size: 15px;
+    font-weight: 600;
+    color: #464646;
+    margin-bottom: .9rem;
+
+    &::before {
+      content: '';
+      width: 4px;
+      height: 15px;
+      border-radius: 2px;
+      background: #1677ff;
+    }
+  }
+
+  // KPI 指标卡: 第一行4个等宽
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 1rem;
+
+    @media (max-width: 990px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .kpi-card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 1px 4px rgba(31, 45, 61, 0.08);
+      padding: 1rem 1.2rem;
+
+      .kpi-label {
+        font-size: 13px;
+        color: #909198;
+        margin-bottom: .35rem;
+      }
+
+      .kpi-value {
+        font-size: 26px;
+        font-weight: 600;
+        color: #464646;
+        line-height: 1.2;
+
+        .kpi-sub {
+          font-size: 13px;
+          font-weight: 400;
+          color: #909198;
+          margin-left: .4rem;
+        }
+      }
+    }
+  }
+
+  // 患者信息卡
+  .patient-card {
+    display: flex;
+    align-items: center;
+    gap: 1.4rem;
+    flex-wrap: wrap;
+
+    .patient-name {
+      font-size: 20px;
+      font-weight: 600;
+      color: #464646;
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+    }
+
+    .patient-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .4rem 1.6rem;
+      color: #464646;
+      font-size: 13px;
+
+      .meta-item {
+        .meta-label {
+          color: #909198;
+          margin-right: .35rem;
+        }
+      }
+    }
+  }
+
+  // 研究对象资料: 全字段三列网格
+  .subject-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: .55rem 1.5rem;
+
+    @media (max-width: 990px) {
+      grid-template-columns: repeat(2, 1fr);
+
+      .item-wide {
+        grid-column: span 2;
+      }
+    }
+
+    .subject-item {
+      font-size: 13px;
+      color: #464646;
+      min-width: 0;
+
+      .item-label {
+        color: #909198;
+        margin-right: .4rem;
+      }
+
+      .item-value {
+        word-break: break-all;
+      }
+
+      &.item-wide {
+        grid-column: span 3;
+      }
+    }
+  }
+
+  // 检查指标总览: 小图矩阵
+  .metric-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+
+    @media (max-width: 1200px) {
+      grid-template-columns: 1fr;
+    }
+
+    .metric-cell {
+      border: 1px solid #f0f1f3;
+      border-radius: 8px;
+      padding: .6rem .8rem .2rem;
+
+      .metric-cell-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: #464646;
+        margin-bottom: .2rem;
+      }
+    }
+  }
+
+  // 明细表卡片
+  .report-table-card {
+    padding: 1rem 1.2rem;
+
+    .ant-table-thead > tr > th {
+      background: #f7f8fa;
+      color: #464646;
+      font-weight: 600;
+    }
+
+    .ant-table-tbody > tr:hover > td {
+      background: #f0f7ff;
+    }
+  }
+
+  .chart-hint {
+    color: #909198;
+    font-size: 12px;
+  }
+}

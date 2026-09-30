@@ -11,6 +11,7 @@ import ReportChart from "./ReportChart.jsx";
 import {ClinicalReportQuery, ClinicalUserList} from "@/api/system/clinical/index.js";
 import {TenantList} from "@/api/system/saas/index.js";
 import {ClinicalConfigs} from "@/pages/system/clinical/configs.js";
+import './index.scss';
 
 const BOOL_OPTIONS = [{label: '是', value: 1}, {label: '否', value: 0}];
 
@@ -43,14 +44,29 @@ const CMR_METRICS = {
     lvEcv: '左心室ECV(%)', trFraction: '三尖瓣反流分数(%)', hct: 'HCT',
 };
 
+// 图表配色与坐标样式(设计规范参考 jimubi-dashboard skill: 轴标签#909198 网格#F3F3F3 标题#464646)
+const CHART_COLORS = ['#1677ff', '#00b578', '#faad14', '#ff4d4f', '#722ed1', '#13c2c2'];
+const CHART_AXIS = {axisLabel: {color: '#909198'}, splitLine: {lineStyle: {color: '#F3F3F3'}}};
+
 const toMs = value => {
     if (value === undefined || value === null || value === '') return null;
     const date = dayjs(String(value).replace('T', ' ').slice(0, 16));
     return date.isValid() ? date.valueOf() : null;
 };
 
+// 卡片区块: 统一标题样式
+const CardSection = ({title, extra, children}) => (
+    <div className="report-card">
+        <div className="report-card-title">
+            {title}
+            {extra && <span style={{fontWeight: 400, marginLeft: 'auto'}}>{extra}</span>}
+        </div>
+        {children}
+    </div>
+);
+
 // SaaS临床-综合报表: 按研究编号/住院编号一次查出关联的全部业务记录;
-// 术后护理/药物暴露/超声/CMR 页签带图表化展示(折线/时间轴)与自定义日期范围
+// KPI概要+患者信息卡+图表化展示(术后护理折线/用药时间轴/检查指标折线), 设计参考 jimubi-dashboard 规范
 export default function ClinicalReport() {
     const role = useAuthStore(state => state.role);
     const isPlatform = role === 'platform';
@@ -61,11 +77,11 @@ export default function ClinicalReport() {
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState(null);
     const [userOptions, setUserOptions] = useState([]);
-    // 术后护理/药物暴露 自定义日期范围(支持到小时), 超声/CMR 折线指标
+    // 术后护理/药物暴露 自定义日期范围(支持到小时), 超声/CMR 折线指标(空=总览模式)
     const [nursingRange, setNursingRange] = useState(undefined);
     const [drugRange, setDrugRange] = useState(undefined);
-    const [echoMetric, setEchoMetric] = useState('lvef');
-    const [cmrMetric, setCmrMetric] = useState('rvef');
+    const [echoMetric, setEchoMetric] = useState('');
+    const [cmrMetric, setCmrMetric] = useState('');
 
     useEffect(() => {
         // 随访任务的负责人是用户id, 需要映射成姓名
@@ -127,6 +143,20 @@ export default function ClinicalReport() {
         setResult(null);
     };
 
+    // ===== KPI 概要(第一行4个指标卡) =====
+    const kpis = useMemo(() => {
+        const followUps = result?.followUps ?? [];
+        const pending = followUps.filter(f => f.status === 1).length;
+        const echoCount = (result?.echos ?? []).length;
+        const cmrCount = (result?.cmrs ?? []).length;
+        return [
+            {label: '住院次数', value: (result?.hospitalizations ?? []).length},
+            {label: '随访任务', value: followUps.length, sub: pending > 0 ? `待完成 ${pending}` : undefined},
+            {label: '检查记录', value: echoCount + cmrCount, sub: `超声 ${echoCount} · CMR ${cmrCount}`},
+            {label: '用药记录', value: (result?.drugs ?? []).length},
+        ];
+    }, [result]);
+
     // ===== 术后护理: 记录类别区分折线(横坐标记录时间, 数值需可解析), 支持日期范围到小时 =====
     const nursingData = result?.nursings ?? [];
     const filteredNursings = useMemo(() => {
@@ -143,30 +173,31 @@ export default function ClinicalReport() {
         const series = [];
         NURSING_CATEGORIES.forEach(category => {
             const points = filteredNursings
-                .filter(row => row.category === category && !isNaN(Number(row.rawValue)) && row.rawValue !== '' && row.rawValue !== null)
+                .filter(row => row.category === category && row.rawValue !== '' && row.rawValue !== null && !isNaN(Number(row.rawValue)))
                 .map(row => [toMs(row.recordTime), Number(row.rawValue)])
                 .filter(point => point[0] !== null)
                 .sort((a, b) => a[0] - b[0]);
             if (points.length) {
-                series.push({name: category, type: 'line', showSymbol: true, data: points, connectNulls: true});
+                series.push({name: category, type: 'line', showSymbol: true, smooth: true, data: points, connectNulls: true});
             }
         });
         // 类别之外的数值型记录归为"其他"
         const known = new Set(NURSING_CATEGORIES);
         const otherPoints = filteredNursings
-            .filter(row => !known.has(row.category) && !isNaN(Number(row.rawValue)) && row.rawValue !== '' && row.rawValue !== null)
+            .filter(row => !known.has(row.category) && row.rawValue !== '' && row.rawValue !== null && !isNaN(Number(row.rawValue)))
             .map(row => [toMs(row.recordTime), Number(row.rawValue)])
             .filter(point => point[0] !== null)
             .sort((a, b) => a[0] - b[0]);
         if (otherPoints.length) {
-            series.push({name: '其他', type: 'line', showSymbol: true, data: otherPoints});
+            series.push({name: '其他', type: 'line', showSymbol: true, smooth: true, data: otherPoints});
         }
         return {
+            color: CHART_COLORS,
             tooltip: {trigger: 'axis'},
-            legend: {top: 0},
-            grid: {left: 48, right: 24, top: 36, bottom: 56},
-            xAxis: {type: 'time'},
-            yAxis: {type: 'value', scale: true},
+            legend: {top: 0, textStyle: {color: '#464646'}},
+            grid: {left: 48, right: 24, top: 40, bottom: 64},
+            xAxis: {type: 'time', ...CHART_AXIS},
+            yAxis: {type: 'value', scale: true, ...CHART_AXIS},
             // 数据缩放: 支持在图上框选/拖拽日期范围
             dataZoom: [{type: 'inside'}, {type: 'slider', height: 18, bottom: 8}],
             series,
@@ -202,13 +233,14 @@ export default function ClinicalReport() {
             items.push({name: label, value: [start, stop, labelIndex.get(label)], dose: row.dose, unit: row.doseUnit});
         });
         return {
+            color: CHART_COLORS,
             tooltip: {formatter: params => {
                 const item = params.value;
                 return `${params.name}<br/>${dayjs(item[0]).format('YYYY-MM-DD HH:mm')} ~ ${dayjs(item[1]).format('YYYY-MM-DD HH:mm')}`;
             }},
-            grid: {left: 130, right: 30, top: 16, bottom: 40},
-            xAxis: {type: 'time'},
-            yAxis: {type: 'category', data: labels, inverse: true},
+            grid: {left: 130, right: 30, top: 16, bottom: 44},
+            xAxis: {type: 'time', ...CHART_AXIS},
+            yAxis: {type: 'category', data: labels, inverse: true, axisLabel: {color: '#464646'}},
             dataZoom: [{type: 'inside'}, {type: 'slider', height: 18, bottom: 4}],
             series: [{
                 type: 'custom',
@@ -228,88 +260,99 @@ export default function ClinicalReport() {
                 },
                 data: items,
                 encode: {x: [0, 1], y: 2},
-                itemStyle: {color: '#2db7f5', opacity: 0.85},
+                itemStyle: {color: '#1677ff', opacity: 0.85, borderRadius: 4},
             }],
         };
     }, [filteredDrugs]);
 
-    // ===== 超声/CMR: 指标折线(横坐标检查日期) =====
+    // ===== 超声/CMR: 指标折线(横坐标检查日期); mini=总览小图(无缩放条, 紧凑边距) =====
     const echoData = result?.echos ?? [];
     const cmrData = result?.cmrs ?? [];
 
-    const metricChartOption = (rows, timeField, metric, metricLabel) => {
+    const metricChartOption = (rows, timeField, metric, metricLabel, mini) => {
         const points = rows
             .map(row => [toMs(row[timeField]), Number(row[metric])])
             .filter(point => point[0] !== null && !isNaN(point[1]))
             .sort((a, b) => a[0] - b[0]);
-        return {
+        const option = {
+            color: CHART_COLORS,
             tooltip: {trigger: 'axis'},
-            grid: {left: 48, right: 24, top: 20, bottom: 40},
-            xAxis: {type: 'time'},
-            yAxis: {type: 'value', scale: true},
-            dataZoom: [{type: 'inside'}],
-            series: [{name: metricLabel, type: 'line', showSymbol: true, data: points, connectNulls: true}],
+            grid: mini ? {left: 46, right: 14, top: 14, bottom: 26} : {left: 48, right: 24, top: 20, bottom: 40},
+            xAxis: {type: 'time', ...CHART_AXIS},
+            yAxis: {type: 'value', scale: true, ...CHART_AXIS},
+            series: [{name: metricLabel, type: 'line', showSymbol: true, smooth: true, data: points, connectNulls: true}],
         };
+        if (!mini) option.dataZoom = [{type: 'inside'}];
+        return option;
     };
 
     const subject = result?.subject;
     const subjectFieldMap = Object.fromEntries(ClinicalConfigs.subject.fields.map(f => [f.name, f]));
+    // 研究对象资料卡: 全字段展示(姓名/研究编号已在头部; 长文本字段独占整行)
+    const subjectFields = Object.keys(subjectFieldMap).filter(name => name !== 'name' && name !== 'subjectNo');
 
-    // 各页签展示内容: 带图表的页签为 图表区+明细表, 其余为明细表
+    // 明细表
+    const renderTable = (config, rows) => (
+        <Table rowKey={'id'} size={'small'} columns={buildColumns(config)} dataSource={rows}
+               scroll={{x: 'max-content'}}
+               pagination={rows.length > 10 ? {pageSize: 10, showTotal: t => `共 ${t} 条`} : false}
+               locale={{emptyText: <Empty description={`暂无${config.title}记录`}/>}}/>
+    );
+
+    // 各页签展示内容: 图表卡片 + 明细卡片, 其余仅明细卡片
     const renderTabContent = (configKey, rows) => {
         const config = ClinicalConfigs[configKey];
-        const table = (
-            <Table rowKey={'id'} size={'small'} columns={buildColumns(config)} dataSource={rows}
-                   scroll={{x: 'max-content'}}
-                   pagination={rows.length > 10 ? {pageSize: 10, showTotal: t => `共 ${t} 条`} : false}
-                   locale={{emptyText: <Empty description={`暂无${config.title}记录`}/>}}/>
-        );
         if (configKey === 'nursing') {
             // 展示依据: 记录类别/记录数值/记录单位/记录时间
             const nursingConfig = {...config, columns: ['category', 'rawValue', 'unit', 'recordTime']};
-            const nursingTable = (
-                <Table rowKey={'id'} size={'small'} columns={buildColumns(nursingConfig)} dataSource={filteredNursings}
-                       pagination={filteredNursings.length > 10 ? {pageSize: 10, showTotal: t => `共 ${t} 条`} : false}
-                       locale={{emptyText: <Empty description="暂无术后护理记录"/>}}/>
-            );
             return (
                 <>
-                    <div style={{display: 'flex', alignItems: 'center', gap: '.6rem', margin: '.4rem 0 .6rem'}}>
-                        <span style={{color: '#999', fontSize: 13}}>日期范围(到小时)</span>
-                        <DatePicker.RangePicker
-                            showTime={{format: 'HH:mm'}}
-                            format="YYYY-MM-DD HH:mm"
-                            value={nursingRange}
-                            onChange={setNursingRange}
-                            allowClear
-                        />
-                        <span style={{color: '#999', fontSize: 12}}>折线按记录类别区分数值记录, 图上可拖拽框选缩放</span>
-                    </div>
-                    {filteredNursings.length
-                        ? <ReportChart option={nursingChartOption}/>
-                        : <Empty description="暂无可绘制的数据(记录数值需为数字)"/>}
-                    <div style={{marginTop: '1rem'}}>{nursingTable}</div>
+                    <CardSection title="术后护理趋势" extra={
+                        <>
+                            <span className="chart-hint">日期范围(到小时)</span>
+                            <DatePicker.RangePicker
+                                size="small"
+                                showTime={{format: 'HH:mm'}}
+                                format="YYYY-MM-DD HH:mm"
+                                value={nursingRange}
+                                onChange={setNursingRange}
+                                allowClear
+                            />
+                        </>
+                    }>
+                        {filteredNursings.length
+                            ? <ReportChart option={nursingChartOption}/>
+                            : <Empty description="暂无可绘制的数据(记录数值需为数字)"/>}
+                    </CardSection>
+                    <CardSection title="护理明细">
+                        {renderTable(nursingConfig, filteredNursings)}
+                    </CardSection>
                 </>
             );
         }
         if (configKey === 'drug') {
             return (
                 <>
-                    <div style={{display: 'flex', alignItems: 'center', gap: '.6rem', margin: '.4rem 0 .6rem'}}>
-                        <span style={{color: '#999', fontSize: 13}}>日期范围(到小时)</span>
-                        <DatePicker.RangePicker
-                            showTime={{format: 'HH:mm'}}
-                            format="YYYY-MM-DD HH:mm"
-                            value={drugRange}
-                            onChange={setDrugRange}
-                            allowClear
-                        />
-                        <span style={{color: '#999', fontSize: 12}}>每行一个药物, 条形为开始~结束时间段</span>
-                    </div>
-                    {filteredDrugs.length
-                        ? <ReportChart option={drugChartOption}/>
-                        : <Empty description="暂无可绘制的用药记录"/>}
-                    <div style={{marginTop: '1rem'}}>{table}</div>
+                    <CardSection title="用药时间轴" extra={
+                        <>
+                            <span className="chart-hint">日期范围(到小时)</span>
+                            <DatePicker.RangePicker
+                                size="small"
+                                showTime={{format: 'HH:mm'}}
+                                format="YYYY-MM-DD HH:mm"
+                                value={drugRange}
+                                onChange={setDrugRange}
+                                allowClear
+                            />
+                        </>
+                    }>
+                        {filteredDrugs.length
+                            ? <ReportChart option={drugChartOption}/>
+                            : <Empty description="暂无可绘制的用药记录"/>}
+                    </CardSection>
+                    <CardSection title="用药明细">
+                        {renderTable(config, rows)}
+                    </CardSection>
                 </>
             );
         }
@@ -317,70 +360,123 @@ export default function ClinicalReport() {
             const isEcho = configKey === 'echo';
             const metrics = isEcho ? ECHO_METRICS : CMR_METRICS;
             const metric = isEcho ? echoMetric : cmrMetric;
-            const metricLabel = metrics[metric] ?? metric;
             const rows = isEcho ? echoData : cmrData;
             const timeField = isEcho ? 'examTime' : 'examDate';
+            // 指标为空=总览模式: 全部指标小图矩阵
+            const metricOptions = [{value: '', label: '总览(全部指标)'}, ...Object.entries(metrics).map(([value, label]) => ({value, label}))];
             return (
                 <>
-                    <div style={{display: 'flex', alignItems: 'center', gap: '.6rem', margin: '.4rem 0 .6rem'}}>
-                        <span style={{color: '#999', fontSize: 13}}>选择指标</span>
-                        <Select style={{width: '14rem'}} value={metric}
-                                onChange={isEcho ? setEchoMetric : setCmrMetric}
-                                options={Object.entries(metrics).map(([value, label]) => ({value, label}))}/>
-                        <span style={{color: '#999', fontSize: 12}}>折线横坐标为检查日期</span>
-                    </div>
-                    {rows.length
-                        ? <ReportChart option={metricChartOption(rows, timeField, metric, metricLabel)}/>
-                        : <Empty description="暂无检查记录"/>}
-                    <div style={{marginTop: '1rem'}}>{table}</div>
+                    <CardSection title="指标趋势" extra={
+                        <>
+                            <span className="chart-hint">{metric ? '选择指标' : '总览模式'}</span>
+                            <Select size="small" style={{width: '13rem'}} value={metric}
+                                    onChange={isEcho ? setEchoMetric : setCmrMetric}
+                                    options={metricOptions}/>
+                        </>
+                    }>
+                        {rows.length ? (
+                            metric
+                                ? <ReportChart option={metricChartOption(rows, timeField, metric, metrics[metric] ?? metric)}/>
+                                : <div className="metric-grid">
+                                    {Object.entries(metrics).map(([field, label]) => {
+                                        const hasData = rows.some(row => row[field] !== undefined && row[field] !== null && row[field] !== '' && !isNaN(Number(row[field])));
+                                        if (!hasData) return null;
+                                        return (
+                                            <div className="metric-cell" key={field}>
+                                                <div className="metric-cell-title">{label}</div>
+                                                <ReportChart option={metricChartOption(rows, timeField, field, label, true)} height="9rem"/>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                        ) : <Empty description="暂无检查记录"/>}
+                    </CardSection>
+                    <CardSection title={`${config.title}明细`}>
+                        {renderTable(config, rows)}
+                    </CardSection>
                 </>
             );
         }
-        return table;
+        return (
+            <CardSection title={`${config.title}明细`}>
+                {renderTable(config, rows)}
+            </CardSection>
+        );
     };
 
     return (
-        <>
-            <SearchRow>
-                {isPlatform && (
-                    <SearchRow.Item title={'租户'}>
-                        <BaseAntdSelect
-                            value={tenantId}
-                            setValue={setTenantId}
-                            style={{width: '14rem'}}
-                            api={TenantList}
-                            labelName={'tenantName'}
-                            valueName={'id'}
-                        />
+        <div className="report-page">
+            <div className="report-card">
+                <SearchRow>
+                    {isPlatform && (
+                        <SearchRow.Item title={'租户'}>
+                            <BaseAntdSelect
+                                value={tenantId}
+                                setValue={setTenantId}
+                                style={{width: '14rem'}}
+                                api={TenantList}
+                                labelName={'tenantName'}
+                                valueName={'id'}
+                            />
+                        </SearchRow.Item>
+                    )}
+                    <SearchRow.Item title={'研究编号'}>
+                        <BaseAntdInput value={subjectNo} setValue={setSubjectNo}/>
                     </SearchRow.Item>
-                )}
-                <SearchRow.Item title={'研究编号'}>
-                    <BaseAntdInput value={subjectNo} setValue={setSubjectNo}/>
-                </SearchRow.Item>
-                <SearchRow.Item title={'住院编号'}>
-                    <BaseAntdInput value={recordNo} setValue={setRecordNo}/>
-                </SearchRow.Item>
-                <SearchRow.Item>
-                    <Button type={'primary'} icon={<SearchOutlined/>} loading={loading} onClick={doQuery}>查询</Button>
-                    <Button style={{marginLeft: '.6rem'}} onClick={onReset}>重置</Button>
-                </SearchRow.Item>
-            </SearchRow>
+                    <SearchRow.Item title={'住院编号'}>
+                        <BaseAntdInput value={recordNo} setValue={setRecordNo}/>
+                    </SearchRow.Item>
+                    <SearchRow.Item>
+                        <Button type={'primary'} icon={<SearchOutlined/>} loading={loading} onClick={doQuery}>查询</Button>
+                        <Button style={{marginLeft: '.6rem'}} onClick={onReset}>重置</Button>
+                    </SearchRow.Item>
+                </SearchRow>
+            </div>
             {!result && (
-                <Empty style={{marginTop: '6rem'}}
+                <Empty className="report-card" style={{marginTop: '2rem', padding: '3rem 0'}}
                        description={'输入研究编号或住院编号，查询该对象关联的全部业务记录'}/>
             )}
             {result && (
-                <div style={{background: '#fff', padding: '1rem', borderRadius: '.5rem'}}>
-                    <Descriptions
-                        title={<span>研究对象 <Tag color={'blue'}>{subject?.subjectNo}</Tag></span>}
-                        bordered size={'small'} column={3} style={{marginBottom: '1rem'}}
-                    >
-                        {SUBJECT_SUMMARY.map(name => (
-                            <Descriptions.Item label={subjectFieldMap[name]?.label ?? name} key={name}>
-                                {renderCell(subjectFieldMap[name], subject?.[name])}
-                            </Descriptions.Item>
+                <>
+                    {/* KPI 概要: 第一行4个指标卡 */}
+                    <div className="kpi-row">
+                        {kpis.map(kpi => (
+                            <div className="kpi-card" key={kpi.label}>
+                                <div className="kpi-label">{kpi.label}</div>
+                                <div className="kpi-value">
+                                    {kpi.value}
+                                    {kpi.sub && <span className="kpi-sub">{kpi.sub}</span>}
+                                </div>
+                            </div>
                         ))}
-                    </Descriptions>
+                    </div>
+                    {/* 患者信息卡 */}
+                    <div className="report-card patient-card">
+                        <div className="patient-name">
+                            {subject?.name ?? '未知研究对象'}
+                            <Tag color={'blue'}>{subject?.subjectNo}</Tag>
+                        </div>
+                        <div className="patient-meta">
+                            {['gender', 'birthDate', 'diagnosisGroup', 'phone', 'admissionNo'].map(name => (
+                                <span className="meta-item" key={name}>
+                                    <span className="meta-label">{subjectFieldMap[name]?.label ?? name}</span>
+                                    {renderCell(subjectFieldMap[name], subject?.[name])}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+                    {/* 研究对象资料: 全字段 */}
+                    <CardSection title="研究对象资料">
+                        <div className="subject-grid">
+                            {subjectFields.map(name => (
+                                <div className={`subject-item${['nonCardiacDiagnosis', 'combinedCardiacDefect', 'remark'].includes(name) ? ' item-wide' : ''}`}
+                                     key={name}>
+                                    <span className="item-label">{subjectFieldMap[name]?.label ?? name}</span>
+                                    <span className="item-value">{renderCell(subjectFieldMap[name], subject?.[name])}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </CardSection>
                     <Tabs
                         items={REPORT_TABS.map(tab => {
                             const config = ClinicalConfigs[tab.configKey];
@@ -392,8 +488,8 @@ export default function ClinicalReport() {
                             };
                         })}
                     />
-                </div>
+                </>
             )}
-        </>
+        </div>
     );
 }
