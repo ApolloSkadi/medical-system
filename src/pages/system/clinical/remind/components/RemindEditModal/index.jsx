@@ -7,11 +7,11 @@ import {easyNotNull} from "@/utils/antd-validator.js";
 import useAuthStore from "@/store/useAuthStore.js";
 import {TenantList} from "@/api/system/saas/index.js";
 
-// 随访类型选项(与随访任务followupType编码一致: 1超声 2CMR 3门诊 4其他)
+// 随访类型选项(与随访任务followupType编码一致: 1: 访视一, 2: 访视二, 3: 访视三, 4: 其他)
 const FOLLOW_TYPE_OPTIONS = [
-    {label: '超声', value: 1},
-    {label: 'CMR', value: 2},
-    {label: '门诊', value: 3},
+    {label: '访视一', value: 1},
+    {label: '访视二', value: 2},
+    {label: '访视三', value: 3},
     {label: '其他', value: 4},
 ];
 

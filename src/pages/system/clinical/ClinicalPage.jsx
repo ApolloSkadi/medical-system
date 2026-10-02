@@ -1,5 +1,5 @@
 import {useEffect, useMemo, useRef, useState} from "react";
-import {Button, Col, DatePicker, Form, Input, InputNumber, message, Modal, Row, Upload} from "antd";
+import {Button, Col, DatePicker, Form, Input, InputNumber, message, Modal, Row, Tag, Upload} from "antd";
 import {FAntdInput} from "izid";
 import {FileOutlined, FileExcelOutlined, ImportOutlined, UploadOutlined} from "@ant-design/icons";
 import {useLocation, useNavigate} from "react-router-dom";
@@ -34,7 +34,7 @@ const downloadBlob = (blob, fileName) => {
     URL.revokeObjectURL(url);
 };
 
-// 机械通气多组编辑器: 动态增删行, 小时留空由后端按起止自动计算
+// 机械通气多组编辑器: 分组条目(编号/起止时间/自动小时), 时间到分钟, 小时留空由后端按起止自动计算
 function VentilationsEditor({value, onChange}) {
     const rows = Array.isArray(value) ? value : [];
     const computedHours = r => {
@@ -53,34 +53,40 @@ function VentilationsEditor({value, onChange}) {
     const totalHours = rows.reduce((sum, r) => sum + (computedHours(r) ?? 0), 0);
     return (
         <div style={{width: '100%'}}>
-            {rows.map((r, i) => (
-                <Row gutter={8} key={i} style={{marginBottom: '.4rem'}} align="middle">
-                    <Col span={10}>
-                        <DatePicker showTime style={{width: '100%'}} placeholder="机械通气开始时间"
-                                    value={r.startTime ? dayjs(r.startTime) : null}
+            {rows.length === 0 && (
+                <div style={{fontSize: 12, color: '#999', marginBottom: '.4rem'}}>暂无机械通气记录，点击下方按钮添加</div>
+            )}
+            {rows.map((r, i) => {
+                const hours = computedHours(r);
+                return (
+                    <div key={i} style={{
+                        display: 'flex', alignItems: 'center', gap: 8,
+                        marginBottom: 8, padding: '6px 8px',
+                        background: '#f7f8fa', borderRadius: 6,
+                    }}>
+                        <Tag style={{marginRight: 0}}>第 {i + 1} 组</Tag>
+                        <DatePicker showTime={{format: 'HH:mm'}} format="YYYY-MM-DD HH:mm" placeholder="开始时间"
+                                    style={{flex: 1, minWidth: 0}}
+                                    value={r.startTime ? dayjs(String(r.startTime).replace('T', ' ').slice(0, 16)) : null}
                                     onChange={t => update(i, {startTime: t})}/>
-                    </Col>
-                    <Col span={10}>
-                        <DatePicker showTime style={{width: '100%'}} placeholder="机械通气结束时间"
-                                    value={r.endTime ? dayjs(r.endTime) : null}
+                        <span style={{color: '#bfbfbf'}}>~</span>
+                        <DatePicker showTime={{format: 'HH:mm'}} format="YYYY-MM-DD HH:mm" placeholder="结束时间"
+                                    style={{flex: 1, minWidth: 0}}
+                                    value={r.endTime ? dayjs(String(r.endTime).replace('T', ' ').slice(0, 16)) : null}
                                     onChange={t => update(i, {endTime: t})}/>
-                    </Col>
-                    <Col span={2}>
-                        <span style={{fontSize: 12, color: '#999', whiteSpace: 'nowrap'}}>
-                            {computedHours(r) !== null ? `${computedHours(r)}h` : '自动'}
-                        </span>
-                    </Col>
-                    <Col span={2}>
-                        <Button size={'small'} type={'link'} danger
-                                onClick={() => onChange?.(rows.filter((_, idx) => idx !== i))}>删</Button>
-                    </Col>
-                </Row>
-            ))}
-            <Button size={'small'} type={'dashed'}
+                        <Tag color={hours !== null ? 'blue' : 'default'} style={{marginRight: 0, whiteSpace: 'nowrap'}}>
+                            {hours !== null ? `${hours}小时` : '自动'}
+                        </Tag>
+                        <Button size={'small'} type={'text'} danger
+                                onClick={() => onChange?.(rows.filter((_, idx) => idx !== i))}>删除</Button>
+                    </div>
+                );
+            })}
+            <Button size={'small'} type={'dashed'} block
                     onClick={() => onChange?.([...rows, {}])}>+ 添加一组机械通气</Button>
             {rows.length > 0 && (
-                <div style={{fontSize: 12, color: '#52c41a', marginTop: '.3rem'}}>
-                    合计 {Math.round(totalHours * 10) / 10} 小时（保存后写入总小时数）
+                <div style={{fontSize: 12, color: '#52c41a', marginTop: '.4rem'}}>
+                    共 {rows.length} 组 · 合计 {Math.round(totalHours * 10) / 10} 小时（保存后自动写入机械通气小时）
                 </div>
             )}
         </div>
@@ -331,8 +337,8 @@ export const createClinicalPage = (config) => {
                     payload[f.name] = data[f.name]
                         .filter(v => v.startTime || v.endTime)
                         .map(v => ({
-                            startTime: v.startTime ? dayjs(v.startTime).format(DATETIME_FMT) : undefined,
-                            endTime: v.endTime ? dayjs(v.endTime).format(DATETIME_FMT) : undefined,
+                            startTime: v.startTime ? dayjs(v.startTime).format(DATETIME_MINUTE_FMT) : undefined,
+                            endTime: v.endTime ? dayjs(v.endTime).format(DATETIME_MINUTE_FMT) : undefined,
                             hours: v.hours ?? null,
                         }));
                 }
@@ -367,11 +373,24 @@ export const createClinicalPage = (config) => {
                     return <FAntdInput/>;
             }
         };
-        // 字段两列一组布局，textarea独占一行
+        // 字段两列一组布局, 文本域/机械通气编辑器等整行字段独占一行(不与半宽字段同排)
+        const wideTypes = ['textarea', 'ventilations'];
         const fieldRows = [];
-        for (let i = 0; i < config.fields.length; i += 2) {
-            fieldRows.push(config.fields.slice(i, i + 2));
-        }
+        let rowBuffer = [];
+        config.fields.forEach(field => {
+            if (wideTypes.includes(field.type)) {
+                if (rowBuffer.length) fieldRows.push(rowBuffer);
+                rowBuffer = [];
+                fieldRows.push([field]);
+                return;
+            }
+            rowBuffer.push(field);
+            if (rowBuffer.length === 2) {
+                fieldRows.push(rowBuffer);
+                rowBuffer = [];
+            }
+        });
+        if (rowBuffer.length) fieldRows.push(rowBuffer);
 
         // Excel导入
         const doImport = file => {
@@ -488,7 +507,7 @@ export const createClinicalPage = (config) => {
                     {fieldRows.map(pair => (
                         <Row gutter={12} key={pair[0].name}>
                             {pair.map(field => (
-                                <Col span={field.type === 'textarea' ? 24 : 12} key={field.name}>
+                                <Col span={wideTypes.includes(field.type) ? 24 : 12} key={field.name}>
                                     <Form.Item
                                         label={field.label}
                                         name={field.name}

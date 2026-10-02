@@ -234,8 +234,8 @@ export const ClinicalConfigs = {
     fields: [
       {name: 'admissionDate', label: '入院日期', type: 'date', required: true},
       {name: 'dischargeDate', label: '出院日期', type: 'date'},
-      {name: 'icuInTime', label: 'ICU入科日期', type: 'date'},
-      {name: 'icuOutTime', label: 'ICU出科日期', type: 'date'},
+      {name: 'icuInTime', label: 'ICU入科时间', type: 'datetime'},
+      {name: 'icuOutTime', label: 'ICU出科时间', type: 'datetime'},
       {name: 'ventilations', label: '机械通气记录', type: 'ventilations'},
       {name: 'dischargeStatus', label: '出院状态', type: 'input'},
       {name: 'remark', label: '住院备注', type: 'textarea'},

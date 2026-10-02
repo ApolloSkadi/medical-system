@@ -2,7 +2,6 @@ import {useEffect, useMemo, useState} from "react";
 import {Button, DatePicker, Descriptions, Empty, message, Select, Table, Tabs, Tag} from "antd";
 import {SearchOutlined} from "@ant-design/icons";
 import dayjs from "dayjs";
-import * as echarts from "echarts";
 import useAuthStore from "@/store/useAuthStore.js";
 import SearchRow from "@/component/SearchRow/index.jsx";
 import BaseAntdInput from "@/component/BaseAntdInput/index.jsx";
@@ -170,30 +169,45 @@ export default function ClinicalReport() {
     }, [nursingData, nursingRange]);
 
     const nursingChartOption = useMemo(() => {
-        const series = [];
-        NURSING_CATEGORIES.forEach(category => {
-            const points = filteredNursings
-                .filter(row => row.category === category && row.rawValue !== '' && row.rawValue !== null && !isNaN(Number(row.rawValue)))
-                .map(row => [toMs(row.recordTime), Number(row.rawValue)])
-                .filter(point => point[0] !== null)
-                .sort((a, b) => a[0] - b[0]);
-            if (points.length) {
-                series.push({name: category, type: 'line', showSymbol: true, smooth: true, data: points, connectNulls: true});
-            }
+        // 折线按数据中实际出现的记录类别分组(惯例类别排前, 其余按出现顺序), 避免类别名对不上时全部归入"其他"
+        const groups = new Map();
+        filteredNursings.forEach(row => {
+            if (row.rawValue === '' || row.rawValue === null || isNaN(Number(row.rawValue))) return;
+            const pointTime = toMs(row.recordTime);
+            if (pointTime === null) return;
+            const category = String(row.category ?? '').trim() || '未分类';
+            if (!groups.has(category)) groups.set(category, []);
+            groups.get(category).push({
+                value: [pointTime, Number(row.rawValue)],
+                raw: row.rawValue,
+                unit: row.unit,
+            });
         });
-        // 类别之外的数值型记录归为"其他"
-        const known = new Set(NURSING_CATEGORIES);
-        const otherPoints = filteredNursings
-            .filter(row => !known.has(row.category) && row.rawValue !== '' && row.rawValue !== null && !isNaN(Number(row.rawValue)))
-            .map(row => [toMs(row.recordTime), Number(row.rawValue)])
-            .filter(point => point[0] !== null)
-            .sort((a, b) => a[0] - b[0]);
-        if (otherPoints.length) {
-            series.push({name: '其他', type: 'line', showSymbol: true, smooth: true, data: otherPoints});
-        }
+        const ordered = [...groups.entries()].sort((a, b) => {
+            const ia = NURSING_CATEGORIES.indexOf(a[0]);
+            const ib = NURSING_CATEGORIES.indexOf(b[0]);
+            return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
+        });
+        const series = ordered.map(([name, data]) => ({
+            name,
+            type: 'line',
+            showSymbol: true,
+            smooth: true,
+            data: data.sort((a, b) => a.value[0] - b.value[0]),
+            connectNulls: true,
+        }));
         return {
             color: CHART_COLORS,
-            tooltip: {trigger: 'axis'},
+            // 提示体现护理明细: 类别/原始数值/单位/时间
+            tooltip: {trigger: 'axis', formatter: params => {
+                if (!params?.length) return '';
+                const time = dayjs(params[0].value[0]).format('YYYY-MM-DD HH:mm');
+                const lines = params.map(p => {
+                    const unit = p.data?.unit ? ` ${p.data.unit}` : '';
+                    return `${p.marker}${p.seriesName}：${p.data?.raw ?? p.value[1]}${unit}`;
+                });
+                return `${time}<br/>` + lines.join('<br/>');
+            }},
             legend: {top: 0, textStyle: {color: '#464646'}},
             grid: {left: 48, right: 24, top: 40, bottom: 64},
             xAxis: {type: 'time', ...CHART_AXIS},
@@ -217,51 +231,39 @@ export default function ClinicalReport() {
     }, [drugData, drugRange]);
 
     const drugChartOption = useMemo(() => {
-        const labels = [];
-        const labelIndex = new Map();
-        const items = [];
+        // 折线按药物区分别(每种药物一条线), 数据点携带剂量单位, 提示中体现
+        const seriesMap = new Map();
         filteredDrugs.forEach(row => {
             const start = toMs(row.startTime);
-            if (start === null) return;
+            if (start === null || row.dose === null || row.dose === '' || isNaN(Number(row.dose))) return;
             const label = row.route ? `${row.drugName}（${row.route}）` : (row.drugName ?? '未知药物');
-            if (!labelIndex.has(label)) {
-                labelIndex.set(label, labels.length);
-                labels.push(label);
-            }
-            // 无结束时间按用药一天展示, 便于在时间轴上看到条形
-            const stop = toMs(row.stopTime) ?? start + 24 * 3600 * 1000;
-            items.push({name: label, value: [start, stop, labelIndex.get(label)], dose: row.dose, unit: row.doseUnit});
+            if (!seriesMap.has(label)) seriesMap.set(label, []);
+            seriesMap.get(label).push({value: [start, Number(row.dose)], unit: row.doseUnit});
         });
+        const series = [...seriesMap.entries()].map(([label, data]) => ({
+            name: label,
+            type: 'line',
+            showSymbol: true,
+            data: data.sort((a, b) => a.value[0] - b.value[0]),
+        }));
         return {
             color: CHART_COLORS,
-            tooltip: {formatter: params => {
-                const item = params.value;
-                return `${params.name}<br/>${dayjs(item[0]).format('YYYY-MM-DD HH:mm')} ~ ${dayjs(item[1]).format('YYYY-MM-DD HH:mm')}`;
+            // 提示体现药物剂量与剂量单位
+            tooltip: {trigger: 'axis', formatter: params => {
+                if (!params?.length) return '';
+                const time = dayjs(params[0].value[0]).format('YYYY-MM-DD HH:mm');
+                const lines = params.map(p => {
+                    const unit = p.data?.unit ? ` ${p.data.unit}` : '';
+                    return `${p.marker}${p.seriesName}：剂量 ${p.value[1]}${unit}`;
+                });
+                return `${time}<br/>` + lines.join('<br/>');
             }},
-            grid: {left: 130, right: 30, top: 16, bottom: 44},
-            xAxis: {type: 'time', ...CHART_AXIS},
-            yAxis: {type: 'category', data: labels, inverse: true, axisLabel: {color: '#464646'}},
-            dataZoom: [{type: 'inside'}, {type: 'slider', height: 18, bottom: 4}],
-            series: [{
-                type: 'custom',
-                renderItem: (params, api) => {
-                    const categoryIndex = api.value(2);
-                    const start = api.coord([api.value(0), categoryIndex]);
-                    const end = api.coord([api.value(1), categoryIndex]);
-                    const barHeight = api.size([0, 1])[1] * 0.45;
-                    const clip = echarts.graphic.clipRectByRect({
-                        x: start[0], y: start[1] - barHeight / 2,
-                        width: Math.max(end[0] - start[0], 2), height: barHeight,
-                    }, {
-                        x: params.coordSys.x, y: params.coordSys.y,
-                        width: params.coordSys.width, height: params.coordSys.height,
-                    });
-                    return clip && {type: 'rect', shape: clip, style: api.style()};
-                },
-                data: items,
-                encode: {x: [0, 1], y: 2},
-                itemStyle: {color: '#1677ff', opacity: 0.85, borderRadius: 4},
-            }],
+            legend: {top: 0, textStyle: {color: '#464646'}},
+            grid: {left: 48, right: 24, top: 40, bottom: 40},
+            xAxis: {type: 'time', ...CHART_AXIS, name: '开始时间', nameTextStyle: {color: '#909198'}},
+            yAxis: {type: 'value', scale: true, ...CHART_AXIS, name: '剂量', nameTextStyle: {color: '#909198'}},
+            dataZoom: [{type: 'inside'}],
+            series,
         };
     }, [filteredDrugs]);
 
@@ -309,7 +311,7 @@ export default function ClinicalReport() {
                 <>
                     <CardSection title="术后护理趋势" extra={
                         <>
-                            <span className="chart-hint">日期范围(到小时)</span>
+                            <span className="chart-hint">日期范围(到小时) · 折线按记录类别区分，悬停查看护理明细(原始数值/单位)</span>
                             <DatePicker.RangePicker
                                 size="small"
                                 showTime={{format: 'HH:mm'}}
@@ -333,9 +335,9 @@ export default function ClinicalReport() {
         if (configKey === 'drug') {
             return (
                 <>
-                    <CardSection title="用药时间轴" extra={
+                    <CardSection title="用药剂量趋势" extra={
                         <>
-                            <span className="chart-hint">日期范围(到小时)</span>
+                            <span className="chart-hint">日期范围(到小时) · 折线按药物区分别，悬停查看剂量与单位</span>
                             <DatePicker.RangePicker
                                 size="small"
                                 showTime={{format: 'HH:mm'}}
