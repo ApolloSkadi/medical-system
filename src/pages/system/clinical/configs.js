@@ -250,7 +250,7 @@ export const ClinicalConfigs = {
     search: [{name: 'category', label: '记录类别', type: 'select', options: [{label: '体温', value: '体温'}, {label: '心率', value: '心率'}, {label: '呼吸频率', value: '呼吸频率'}, {label: '血压', value: '血压'}, {label: '大便次数', value: '大便次数'}]}, {name: 'subjectKeyword', label: '研究对象(姓名/编号)', type: 'input'}, {name: 'hospitalizationId', label: '住院编号', type: 'input'}],
     columns: ['recordNo', {name: 'hospitalizationId', label: '住院编号'}, 'category', {name: 'rawValue', label: '记录数值'}, 'unit', 'recordTime'],
     fields: [
-      {name: 'recordNo', label: '护理记录编号', type: 'input', required: true},
+      {name: 'recordNo', label: '护理记录编号(留空自动生成)', type: 'input'},
       {name: 'hospitalizationId', label: '住院编号', type: 'input'},
       {name: 'category', label: '记录类别', type: 'select', required: true, options: [{label: '体温', value: '体温'}, {label: '心率', value: '心率'}, {label: '呼吸频率', value: '呼吸频率'}, {label: '血压', value: '血压'}, {label: '大便次数', value: '大便次数'}, {label: '其他', value: '其他'}]},
       {name: 'rawValue', label: '记录数值', type: 'input', required: true},

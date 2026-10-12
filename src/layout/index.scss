@@ -453,6 +453,29 @@
         gap: 14px;
     }
 
+    .header-icon-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        font-size: 16px;
+        color: #5b6470;
+        cursor: pointer;
+        transition: all .2s;
+
+        &:hover {
+            background: #f0f4ff;
+            color: #1677ff;
+        }
+
+        &.active {
+            background: #e8f1ff;
+            color: #1677ff;
+        }
+    }
+
     .header-date {
         display: flex;
         align-items: center;
@@ -513,13 +536,89 @@
     }
 }
 
-// ===== 内容区 =====
+// ===== 多页签导航栏(与内容区连成一体, 呈文件夹页签样式) =====
+.app-tabs {
+    margin: 12px 14px 0;
+
+    .ant-tabs-nav {
+        margin-bottom: 0;
+        background: #fff;
+        border: 1px solid rgba(11, 42, 85, .06);
+        border-bottom: none;
+        border-radius: 12px 12px 0 0;
+        padding: 7px 10px 0;
+        box-shadow: 0 -1px 3px rgba(31, 45, 61, .04);
+    }
+
+    .ant-tabs-tab {
+        border: none !important;
+        background: transparent !important;
+        border-radius: 8px 8px 0 0 !important;
+        padding: 5px 12px !important;
+        color: #5b6470;
+        transition: color .2s, background .2s;
+
+        .ant-tabs-tab-btn {
+            color: inherit;
+        }
+
+        .ant-tabs-tab-remove {
+            margin-left: 4px;
+            width: 16px;
+            height: 16px;
+            line-height: 16px;
+            border-radius: 4px;
+            color: #b9c0cc;
+
+            &:hover {
+                color: #ff4d4f;
+                background: #fff1f0;
+            }
+        }
+
+        &:hover {
+            background: #f4f7fe !important;
+            color: #1677ff;
+        }
+
+        &.ant-tabs-tab-active {
+            background: #e8f1ff !important;
+
+            .ant-tabs-tab-btn {
+                color: #1677ff !important;
+                font-weight: 600;
+            }
+
+            .ant-tabs-tab-remove {
+                color: #1677ff;
+            }
+        }
+    }
+
+    .tab-ops .ant-btn {
+        color: #5b6470;
+
+        &:hover {
+            color: #1677ff;
+            background: #f0f4ff;
+        }
+    }
+}
+
+// ===== 内容区(页签栏显示时与页签栏连成一体) =====
 .main-content {
     margin: 14px;
     padding: 16px;
-    border-radius: 14px;
-    background: linear-gradient(180deg, #f8fafe 0%, #f2f6fd 100%);
-    border: 1px solid rgba(11, 42, 85, .05);
+    border-radius: 12px;
+    background: #fff;
+    border: 1px solid rgba(11, 42, 85, .06);
+    box-shadow: 0 2px 6px rgba(31, 45, 61, .05);
+
+    &.attached {
+        margin-top: 0;
+        border-radius: 0 0 12px 12px;
+        border-top: none;
+    }
 }
 
 // 小屏适配
@@ -532,10 +631,19 @@
         }
     }
 
+    .app-tabs {
+        margin: 10px 10px 0;
+    }
+
     .main-content {
         margin: 10px;
         padding: 12px;
-        border-radius: 12px;
+
+        &.attached {
+            margin-top: 0;
+            border-radius: 0 0 12px 12px;
+            border-top: none;
+        }
     }
 }
 
